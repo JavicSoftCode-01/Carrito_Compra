@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inventario de Productos</title>
+  <link rel="stylesheet" href="../../assets/styles/index.css">
+  <!-- Puedes incluir aquí Font Awesome o Chart.js si fueran necesarios en esta vista -->
+</head>
+<body>
+
+<!-- Contenedor de notificaciones (para mensajes emergentes, igual que en el panel admin) -->
+<div id="notification-container" class="notification-container"></div>
+
+<header class="navigation">
+  <ul class="nav-list">
+    <li class="nav-item"><a href="../admin-panel.html" class="nav-link">Panel Admin</a></li>
+    <li class="nav-item"><a href="../index.html" class="nav-link">Inicio</a></li>
+  </ul>
+</header>
+
+<main class="inventory-main">
+  <h1>Inventario de Productos</h1>
+  <div id="products-container" class="products-container">
+    <!-- Aquí se cargarán los productos de forma dinámica -->
+  </div>
+</main>
+
+<!-- Se carga el módulo de JavaScript que controla la vista de inventario -->
+<script type="module" src="../../static/scripts/inventory.js"></script>
+</body>
+</html>
