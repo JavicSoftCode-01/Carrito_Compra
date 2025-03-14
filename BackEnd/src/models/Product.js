@@ -1,10 +1,12 @@
+// BackEnd/src/models/Product.js
 class Product {
-  constructor(id, name, price, stock, description = "") {
+  constructor(id, name, price, stock, description = "", imgLink = "") {
     this.id = id;
     this.name = name;
     this.price = price;
     this.stock = stock;
     this.description = description;
+    this.imgLink = imgLink;
   }
 
   // Método para aplicar un descuento porcentual

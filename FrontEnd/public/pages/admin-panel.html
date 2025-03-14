@@ -35,6 +35,38 @@
 <section class="admin-section">
   <h1>Panel de Administrador</h1>
 
+  <!-- Botón que abre el modal para agregar producto -->
+  <button id="btn-open-modal" class="btn-open-modal">Agregar Producto</button>
+
+  <!-- Modal -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span id="modal-close" class="modal-close">&times;</span>
+      <h2>Agregar Nuevo Producto</h2>
+      <form id="product-form">
+        <label for="product-id">ID:</label>
+        <input type="number" id="product-id" required>
+
+        <label for="product-name">Nombre:</label>
+        <input type="text" id="product-name" required>
+
+        <label for="product-price">Precio:</label>
+        <input type="number" id="product-price" step="0.01" required>
+
+        <label for="product-stock">Stock:</label>
+        <input type="number" id="product-stock" required>
+
+        <label for="product-description">Descripción:</label>
+        <textarea id="product-description"></textarea>
+
+        <label for="product-imgLink">Link de Imagen:</label>
+        <input type="url" id="product-imgLink" required>
+
+        <button type="submit">Guardar Producto</button>
+      </form>
+    </div>
+  </div>
+
   <!-- Widgets -->
   <div class="widgets-container">
     <div class="widget">

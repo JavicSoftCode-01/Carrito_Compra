@@ -1,14 +1,18 @@
 class ExecuteManager {
-  static execute(callback, successMessage = "Operación exitosa.", errorMessage = "Ocurrió un error:") {
+
+  /**
+   *  🔰Método para ejecutar operaciones con manejo de errores. 🔰
+   */
+  static execute(callback, successMsg, errorMsg) {
     try {
       const result = callback();
-      console.log(successMessage);
+      if (successMsg) console.log(successMsg);
       return result;
     } catch (error) {
-      console.error(`${errorMessage} ${error.message}`);
+      console.error(`${errorMsg} ${error.message}`);
       return null;
     }
   }
 }
 
-export { ExecuteManager };
+export {ExecuteManager};

@@ -1,4 +1,4 @@
-import {ExecuteManager} from "./execute.js";
+import {ExecuteManager} from "../utils/execute.js";
 
 class LocalStorageManager {
 
