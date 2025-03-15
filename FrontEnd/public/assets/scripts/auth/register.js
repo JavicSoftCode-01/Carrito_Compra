@@ -2,22 +2,18 @@ import {AuthFormManager} from "./utils/authForm.js";
 
 class RegisterManager extends AuthFormManager {
   constructor() {
-    super("registro-form", "contrasena");
-
-    // Definición de los campos específicos para el registro
+    // El primer parámetro es el id del formulario; segundo, el id del input de contraseña
+    super("register-form", "password");
     this.inputFields = {
-      nombres: document.getElementById("nombres"),
-      apellidos: document.getElementById("apellidos"),
-      fechaNacimiento: document.getElementById("fechaNacimiento"),
-      telefono: document.getElementById("telefono"),
-      nombreUsuario: document.getElementById("nombreUsuario"),
-      contrasena: this.passwordInput,
-      confirmarContrasena: document.getElementById("confirmarContrasena")
+      first_name: document.getElementById("first_name"),
+      last_name: document.getElementById("last_name"),
+      username: document.getElementById("username"),
+      password: this.passwordInput,
+      confirm_password: document.getElementById("confirm_password")
     };
   }
 }
 
-//Este código inicializa el `RegisterManager` cuando el contenido del documento ha sido completamente cargado.
 document.addEventListener("DOMContentLoaded", () => {
-    new RegisterManager().init();
+  new RegisterManager().init();
 });

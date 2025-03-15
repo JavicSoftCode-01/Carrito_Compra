@@ -1,0 +1,49 @@
+<!-- FrontEnd/public/pages/carts/carts.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Carrito de Compras</title>
+  <link rel="stylesheet" href="../../../public/assets/styles/index.css"/>
+  <!-- Incluir Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+<body>
+<div id="notification-container" class="notification-container"></div>
+
+<nav class="navigation">
+  <ul class="nav-list">
+    <li class="nav-item"><a href="../admin-panel.html" class="nav-link">Admin Panel</a></li>
+    <li class="nav-item"><a href="../products/products.html" class="nav-link">Productos</a></li>
+    <li class="nav-item dropdown">
+      <a href="../carts/carts.html" id="btn-cart" style="margin-right:20px;"><i class="fa-solid fa-cart-shopping"></i>
+      </a>
+      <span id="usuario-logueado" class="usuario-logueado">Usuario</span>
+      <ul id="logout-menu" class="logout-menu">
+        <a href="#" id="btn-logout" class="btn-logout">Cerrar Sesión</a>
+      </ul>
+    </li>
+  </ul>
+</nav>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const usuarioDisplay = document.getElementById("usuario-logueado");
+    const logoutMenu = document.getElementById("logout-menu");
+    usuarioDisplay.addEventListener("click", function () {
+      logoutMenu.classList.toggle("visible");
+    });
+  });
+</script>
+
+<section class="carts-main">
+  <h1>Mi Carrito de Compras</h1>
+  <!-- Contenedor para los productos del carrito -->
+  <div id="cart-container" class="cart-container"></div>
+  <!-- Sección de resumen: total y botón para vaciar el carrito -->
+  <div id="cart-summary" class="cart-summary" style="margin-top:20px; text-align:center;"></div>
+</section>
+
+<script type="module" src="../../assets/scripts/app.js"></script>
+</body>
+</html>

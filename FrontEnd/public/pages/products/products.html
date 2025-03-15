@@ -1,3 +1,53 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="es">-->
+<!--<head>-->
+<!--  <meta charset="UTF-8"/>-->
+<!--  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>-->
+<!--  <title>Productos</title>-->
+<!--  <link rel="stylesheet" href="../../../public/assets/styles/index.css"/>-->
+<!--</head>-->
+<!--<body>-->
+
+<!--<div id="notification-container" class="notification-container"></div>-->
+
+<!--<nav class="navigation">-->
+<!--  <ul class="nav-list">-->
+<!--    <li class="nav-item"><a href="../admin-panel.html" class="nav-link">Admin Panel</a></li>-->
+<!--    <li class="nav-item"><a href="../inventory/inventory.html" class="nav-link active">Inventario</a></li>-->
+<!--    <li class="nav-item"><a href="../products/products.html" class="nav-link">Productos</a></li>-->
+<!--    <li class="nav-item dropdown">-->
+<!--      <span id="usuario-logueado" class="usuario-logueado">Usuario</span>-->
+<!--      <ul id="logout-menu" class="logout-menu">-->
+<!--        <a href="#" id="btn-logout" class="btn-logout">Cerrar Sesión</a>-->
+<!--      </ul>-->
+<!--    </li>-->
+<!--  </ul>-->
+<!--</nav>-->
+
+<!--<script>-->
+<!--  document.addEventListener("DOMContentLoaded", () => {-->
+<!--    const usuarioDisplay = document.getElementById("usuario-logueado");-->
+<!--    const logoutMenu = document.getElementById("logout-menu");-->
+
+<!--    usuarioDisplay.addEventListener("click", function () {-->
+<!--      // Alterna la clase 'visible' para mostrar u ocultar el menú-->
+<!--      logoutMenu.classList.toggle("visible");-->
+<!--    });-->
+<!--  });-->
+<!--</script>-->
+
+<!--<main class="products-main">-->
+<!--  <h1>Productos</h1>-->
+<!--  <div id="products-container" class="products-container">-->
+<!--    &lt;!&ndash; Aquí se cargarán los productos de forma dinámica &ndash;&gt;-->
+<!--  </div>-->
+<!--</main>-->
+
+<!--<script type="module" src="../../assets/scripts/app.js"></script>-->
+<!--</body>-->
+<!--</html>-->
+
+<!-- products.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,26 +55,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Productos</title>
   <link rel="stylesheet" href="../../../public/assets/styles/index.css"/>
-</head>
+  <!-- Incluir Font Awesome desde CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
 <body>
-
 <div id="notification-container" class="notification-container"></div>
-
-<header class="navigation">
+<nav class="navigation">
   <ul class="nav-list">
     <li class="nav-item"><a href="../admin-panel.html" class="nav-link">Admin Panel</a></li>
-    <li class="nav-item"><a href="../inventory/inventory.html" class="nav-link active">Inventario</a></li>
-    <li class="nav-item"><a href="../products/products.html" class="nav-link">Productos</a></li>
+    <li class="nav-item"><a href="../products/products.html" class="nav-link active">Productos</a></li>
+    <li class="nav-item dropdown">
+      <a href="../carts/carts.html" id="btn-cart" style="margin-right:20px;"><i class="fa-solid fa-cart-shopping"></i>
+      </a>
+      <span id="usuario-logueado" class="usuario-logueado">Usuario</span>
+      <ul id="logout-menu" class="logout-menu">
+        <a href="#" id="btn-logout" class="btn-logout">Cerrar Sesión</a>
+      </ul>
+    </li>
+
   </ul>
-</header>
-
-<main class="products-main">
+</nav>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const usuarioDisplay = document.getElementById("usuario-logueado");
+    const logoutMenu = document.getElementById("logout-menu");
+    usuarioDisplay.addEventListener("click", function () {
+      logoutMenu.classList.toggle("visible");
+    });
+  });
+</script>
+<section class="products-main">
   <h1>Productos</h1>
-  <div id="products-container" class="products-container">
-    <!-- Aquí se cargarán los productos de forma dinámica -->
-  </div>
-</main>
-
+  <!-- Contenedor para las cards de producto -->
+  <div id="products-container" class="products-container"></div>
+</section>
 <script type="module" src="../../assets/scripts/app.js"></script>
 </body>
 </html>

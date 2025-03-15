@@ -4,71 +4,138 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Panel Administrador</title>
-  <!-- Paleta de colores y estilo -->
   <link rel="stylesheet" href="../assets/styles/index.css">
-
-  <!-- Incluir Chart.js desde CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <!-- Incluir Font Awesome desde CDN -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <style>
+      /* CSS para los modales */
+      .modal {
+          display: none; /* oculto por defecto */
+          position: fixed;
+          z-index: 1000;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          overflow: auto;
+          background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      .modal-content {
+          background-color: #fff;
+          margin: 10% auto;
+          padding: 20px;
+          border: 1px solid #888;
+          width: 80%;
+          max-width: 800px;
+          border-radius: 4px;
+          position: relative;
+      }
+
+      .modal-close {
+          position: absolute;
+          right: 10px;
+          top: 10px;
+          font-size: 24px;
+          cursor: pointer;
+      }
+
+      /* Contenedor para los botones, para que queden uno al lado del otro */
+      .btn-container {
+          display: flex;
+          gap: 10px;
+          margin-bottom: 20px;
+      }
+  </style>
 </head>
 <body>
-
 <div id="notification-container" class="notification-container"></div>
 
 <nav class="navigation">
   <ul class="nav-list">
     <li class="nav-item"><a href="./admin-panel.html" class="nav-link">Admin Panel</a></li>
-    <li class="nav-item"><a href="./inventory/inventory.html" class="nav-link">Inventario</a></li>
     <li class="nav-item"><a href="./products/products.html" class="nav-link">Productos</a></li>
     <li class="nav-item dropdown">
       <span id="usuario-logueado" class="usuario-logueado">Usuario</span>
       <ul id="logout-menu" class="logout-menu">
-        <li class="nav-item">
-          <a href="#" id="btn-logout" class="nav-link">Cerrar Sesión</a>
-        </li>
+        <a href="#" id="btn-logout" class="btn-logout">Cerrar Sesión</a>
       </ul>
     </li>
   </ul>
 </nav>
 
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const usuarioDisplay = document.getElementById("usuario-logueado");
+    const logoutMenu = document.getElementById("logout-menu");
+    usuarioDisplay.addEventListener("click", function () {
+      logoutMenu.classList.toggle("visible");
+    });
+  });
+</script>
+
 <section class="admin-section">
   <h1>Panel de Administrador</h1>
+  <!-- Contenedor de botones para agregar producto y ver inventario -->
+  <div class="btn-container">
+    <button id="btn-open-modal" class="btn-open-modal">Agregar Producto</button>
+    <button id="btn-show-inventory" class="btn-show-inventory">Ver Inventario</button>
+  </div>
 
-  <!-- Botón que abre el modal para agregar producto -->
-  <button id="btn-open-modal" class="btn-open-modal">Agregar Producto</button>
-
-  <!-- Modal -->
+  <!-- Modal para formulario (crear/editar producto) -->
   <div id="modal" class="modal">
     <div class="modal-content">
       <span id="modal-close" class="modal-close">&times;</span>
-      <h2>Agregar Nuevo Producto</h2>
+      <h2 id="modal-title">Crear Producto</h2>
       <form id="product-form">
         <label for="product-id">ID:</label>
         <input type="number" id="product-id" required>
-
         <label for="product-name">Nombre:</label>
         <input type="text" id="product-name" required>
-
         <label for="product-price">Precio:</label>
         <input type="number" id="product-price" step="0.01" required>
-
         <label for="product-stock">Stock:</label>
         <input type="number" id="product-stock" required>
-
         <label for="product-description">Descripción:</label>
         <textarea id="product-description"></textarea>
-
         <label for="product-imgLink">Link de Imagen:</label>
         <input type="url" id="product-imgLink" required>
-
         <button type="submit">Guardar Producto</button>
       </form>
     </div>
   </div>
 
-  <!-- Widgets -->
+  <!-- Modal para mostrar la tabla de inventario -->
+  <div id="inventory-modal" class="modal">
+    <div class="modal-content">
+      <span id="inventory-modal-close" class="modal-close">&times;</span>
+      <h2>Inventario de Productos</h2>
+      <table class="inventory-table">
+        <thead>
+        <tr>
+          <th>#</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Precio</th>
+          <th>Stock</th>
+          <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody id="compras-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal de confirmación para eliminar producto -->
+  <div id="delete-confirmation-modal" class="modal">
+    <div class="modal-content">
+      <h3>¿Estás seguro de eliminar este producto?</h3>
+      <button id="delete-confirm-btn">Confirmar</button>
+      <button id="delete-cancel-btn">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- Widgets y gráficos (sin cambios) -->
   <div class="widgets-container">
     <div class="widget">
       <h3>Productos</h3>
@@ -81,8 +148,6 @@
       <span id="widget-total-capital" class="widget-number">0.00</span>
     </div>
   </div>
-
-  <!-- Contenedor de gráficas -->
   <div class="chart-container">
     <div class="chart-box">
       <h3>Productos</h3>
@@ -95,7 +160,6 @@
   </div>
 </section>
 
-<!-- Se carga el módulo principal de JS -->
 <script type="module" src="./../assets/scripts/app.js"></script>
 </body>
 </html>

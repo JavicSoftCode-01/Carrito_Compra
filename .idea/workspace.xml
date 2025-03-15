@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="71f66c54-e24c-4882-bd16-582134ebabff" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/BackEnd/src/services/InventoryServices.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BackEnd/src/services/cartsServices.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BackEnd/src/services/productServices.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/CartManager.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/CartsPage.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FrontEnd/public/pages/carts/carts.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/admin/AdminPanel.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/admin/AdminPanel.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/models/Product.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/models/Product.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/models/User.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/models/User.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/services/InventoryService.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/services/authServices.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/services/authServices.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/auth/login.js" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/auth/login.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/auth/register.js" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/auth/register.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/auth/utils/authForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/auth/utils/authForm.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/auth/utils/validations.js" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/auth/utils/validations.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/utils/dinamicTable.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/public/assets/styles/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/public/assets/styles/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/public/pages/admin-panel.html" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/public/pages/admin-panel.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/public/pages/auth/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/public/pages/auth/login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/public/pages/auth/register.html" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/public/pages/auth/register.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/public/pages/inventory/inventory.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/public/pages/products/products.html" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/public/pages/products/products.html" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 3
+}]]></component>
+  <component name="ProjectId" id="2uMArWN8T5PHagl8EKV6qiEf8BB" />
+  <component name="ProjectViewState">
+    <option name="compactDirectories" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+    <option name="showMembers" value="true" />
+    <option name="sortByType" value="true" />
+    <option name="sortKey" value="BY_TYPE" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "settings.sync",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\JavicSoftCode-01\PycharmProjects\Carrito_Compra\BackEnd\src\services" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-PY-243.25659.43" />
+        <option value="bundled-python-sdk-181015f7ab06-4df51de95216-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-243.25659.43" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="71f66c54-e24c-4882-bd16-582134ebabff" name="Changes" comment="" />
+      <created>1742048273780</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1742048273780</updated>
+      <workItem from="1742048278490" duration="22117000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

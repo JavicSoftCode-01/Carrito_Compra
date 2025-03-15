@@ -1,3 +1,7 @@
+* {
+    font-family: Georgia, cursive;
+}
+
 /* Estilos globales */
 body {
     font-family: 'Arial', sans-serif;
@@ -136,7 +140,7 @@ body {
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 15px;
+    padding: 10px;
     text-align: center;
     flex: 1 1 calc(33% - 40px); /* Ajusta el ancho de las tarjetas */
     max-width: 300px;
@@ -173,216 +177,311 @@ body {
 
 /* Tarjeta del producto */
 .product-card {
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  padding: 15px;
-  text-align: center;
-  flex: 1 1 calc(33% - 40px);
-  max-width: 300px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    text-align: center;
+    flex: 1 1 calc(33% - 40px);
+    max-width: 300px;
 }
 
 .product-image {
-  width: 100%;
-  height: auto;
-  border-radius: 4px;
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
 }
 
 .product-name {
-  font-size: 1.2rem;
-  margin: 10px 0;
+    font-size: 1.2rem;
+    margin: 10px 0;
 }
 
 .product-description {
-  font-size: 0.9rem;
-  margin-bottom: 10px;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
 }
 
 .product-price,
 .product-stock {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 /* Formulario para agregar productos */
 .add-product {
-  margin-top: 40px;
-  background-color: #f9f9f9;
-  padding: 20px;
-  border-radius: 8px;
+    margin-top: 40px;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
 }
 
 .add-product h2 {
-  margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 
 .add-product form {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
 }
 
 .add-product form label {
-  grid-column: span 2;
-  font-weight: bold;
+    grid-column: span 2;
+    font-weight: bold;
 }
 
 .add-product form input,
 .add-product form textarea {
-  grid-column: span 2;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+    grid-column: span 2;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
 .add-product form button {
-  grid-column: span 2;
-  padding: 10px;
-  background-color: #ff9aa2;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+    grid-column: span 2;
+    padding: 10px;
+    background-color: #ff9aa2;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
 .add-product form button:hover {
-  background-color: #ffb7b2;
+    background-color: #ffb7b2;
 }
 
 /* Responsividad */
 @media (max-width: 768px) {
-  .product-card {
-    flex: 1 1 100%;
-  }
+    .product-card {
+        flex: 1 1 100%;
+    }
 
-  .add-product form {
-    grid-template-columns: 1fr;
-  }
+    .add-product form {
+        grid-template-columns: 1fr;
+    }
 }
+
 /* Estilos para el botón de abrir modal */
-.btn-open-modal {
-  background-color: #ff9aa2;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-bottom: 20px;
+.btn-open-modal, .btn-show-inventory {
+    background-color: #ff9aa2;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 20px;
 }
 
 /* Estilos del Modal */
 .modal {
-  display: none; /* Oculto por defecto */
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0,0,0,0.5);
+    display: none; /* Oculto por defecto */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 .modal-content {
-  background-color: #fff;
-  margin: 10% auto;
-  padding: 20px;
-  border-radius: 8px;
-  max-width: 500px;
-  position: relative;
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 500px;
+    position: relative;
 }
 
 .modal-close {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 24px;
-  cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
 }
 
 /* Opcional: Estilos para el formulario dentro del modal */
 #product-form {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
 }
 
 #product-form label {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 #product-form input,
 #product-form textarea {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
 #product-form button {
-  padding: 10px;
-  background-color: #ff9aa2;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+    padding: 10px;
+    background-color: #ff9aa2;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }
+
 #product-form button:hover {
-  background-color: #ffb7b2;
+    background-color: #ffb7b2;
 }
 
 /* Notificaciones */
 .notification-container {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 9999;
-  max-width: 100%;
-  width: 400;
+    position: fixed;
+    top: 40px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 100%;
+    width: 400;
 }
 
 .notification {
-  padding: 15px 20px;
-  margin-bottom: 15px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  color: #fff;
-  opacity: 1;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: slideIn 0.3s;
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    color: #fff;
+    opacity: 1;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: slideIn 0.3s;
 }
 
 @keyframes slideIn {
-  from {
-      transform: translateX(100%);
-      opacity: 0;
-  }
-  to {
-      transform: translateX(0);
-      opacity: 1;
-  }
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
 .notification.success {
-  background-color: #00C700;
+    background-color: #00C700;
 }
 
 .notification.error {
-  background-color: red;
+    background-color: red;
 }
 
 .notification.warning {
-  color: #000;
-  background-color: yellow;
+    color: #000;
+    background-color: yellow;
 }
 
 .notification.info {
-  background-color: rgb(76, 139, 254);
+    background-color: rgb(76, 139, 254);
 }
 
 .notification.fade-out {
-  transform: translateX(100%);
-  opacity: 0;
-  transition: transform 0.5s ease, opacity 0.5s ease;
+    transform: translateX(100%);
+    opacity: 0;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+/* Oculta el menú de logout por defecto */
+.logout-menu {
+    display: none;
+}
+
+/* Clase para mostrar el menú */
+.logout-menu.visible {
+    display: block;
+}
+
+/* Opcional: Cursor pointer para indicar que el nombre es clickeable */
+.usuario-logueado {
+    cursor: pointer;
+}
+
+.logout-menu {
+    border-radius: 4px;
+}
+
+.btn-logout {
+    display: block; /* Hace que ocupe el ancho completo del contenedor */
+    text-align: center; /* Centra el texto dentro del bloque */
+    padding: 10px; /* Añade espacio alrededor del texto */
+    background-color: #ff9aa2; /* Color de fondo */
+    color: #fff; /* Color del texto */
+    border: none; /* Quita el borde */
+    border-radius: 4px; /* Añade bordes redondeados */
+    cursor: pointer; /* Cambia el cursor al pasar el mouse */
+    text-decoration: none;
+}
+
+/* Estilos para la tabla de inventario */
+.inventory-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.inventory-table th,
+.inventory-table td {
+    border: 1px solid #ddd;
+    padding: 12px 15px;
+    text-align: left;
+}
+
+.inventory-table th {
+    background-color: #ff9aa2; /* Usa el mismo tono que en otros elementos */
+    color: #fff;
+    font-weight: bold;
+}
+
+.inventory-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.inventory-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Responsividad para la tabla */
+@media (max-width: 768px) {
+    .inventory-table thead {
+        display: none;
+    }
+
+    .inventory-table, .inventory-table tbody, .inventory-table tr, .inventory-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .inventory-table tr {
+        margin-bottom: 15px;
+    }
+
+    .inventory-table td {
+        text-align: right;
+        padding-left: 50%;
+        position: relative;
+    }
+
+    .inventory-table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 15px;
+        width: 45%;
+        padding-right: 10px;
+        font-weight: bold;
+        text-align: left;
+    }
 }

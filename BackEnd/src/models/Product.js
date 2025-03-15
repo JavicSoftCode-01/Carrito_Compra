@@ -1,4 +1,3 @@
-// BackEnd/src/models/Product.js
 class Product {
   constructor(id, name, price, stock, description = "", imgLink = "") {
     this.id = id;
@@ -7,6 +6,9 @@ class Product {
     this.stock = stock;
     this.description = description;
     this.imgLink = imgLink;
+
+    console.log("Product constructor called with:", {id, name, price, stock});
+    console.log("Product instance created:", this);
   }
 
   // Método para aplicar un descuento porcentual
