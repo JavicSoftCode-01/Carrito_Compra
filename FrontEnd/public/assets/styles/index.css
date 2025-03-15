@@ -328,3 +328,61 @@ body {
 #product-form button:hover {
   background-color: #ffb7b2;
 }
+
+/* Notificaciones */
+.notification-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  max-width: 100%;
+  width: 400;
+}
+
+.notification {
+  padding: 15px 20px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  color: #fff;
+  opacity: 1;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: slideIn 0.3s;
+}
+
+@keyframes slideIn {
+  from {
+      transform: translateX(100%);
+      opacity: 0;
+  }
+  to {
+      transform: translateX(0);
+      opacity: 1;
+  }
+}
+
+.notification.success {
+  background-color: #00C700;
+}
+
+.notification.error {
+  background-color: red;
+}
+
+.notification.warning {
+  color: #000;
+  background-color: yellow;
+}
+
+.notification.info {
+  background-color: rgb(76, 139, 254);
+}
+
+.notification.fade-out {
+  transform: translateX(100%);
+  opacity: 0;
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}

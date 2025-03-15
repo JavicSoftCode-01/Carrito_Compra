@@ -1,5 +1,6 @@
 import Product from "../../src/models/Product.js";
 import {LocalStorageManager} from "../database/localStorage.js";
+import { NotificationManager } from "../../../FrontEnd/public/assets/scripts/utils/showNotifications.js";
 
 class AdminPanel {
   constructor() {
@@ -159,30 +160,11 @@ class AdminPanel {
     currentProducts.push(newProduct);
     LocalStorageManager.setData("products", currentProducts);
 
-    this.showNotification("Producto agregado correctamente.");
+    NotificationManager.success("Producto agregado correctamente.");
     this.closeModal();
 
     // Redirige a la página de inventario para ver el producto agregado
     // window.location.href = "./inventario/inventario.html";
-  }
-
-  logout() {
-    LocalStorageManager.clearData();
-    window.location.href = "./login.html"; // Ajusta la ruta a tu login
-  }
-
-  showNotification(message) {
-    const notificationContainer = document.getElementById("notification-container");
-    if (!notificationContainer) return;
-
-    const notification = document.createElement("div");
-    notification.className = "notification";
-    notification.textContent = message;
-    notificationContainer.appendChild(notification);
-
-    setTimeout(() => {
-      notification.remove();
-    }, 3000);
   }
 }
 

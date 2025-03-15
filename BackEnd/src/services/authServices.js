@@ -10,7 +10,7 @@ class AuthManager {
     this._KEY_USERS = "users";
     this._KEY_CURRENT_SESSION = "currentSession";
     this._LOGIN_PATH = "/FrontEnd/public/pages/auth/login.html";
-    this._INVENTORY_PATH = "/FrontEnd/public/pages/inventary/inventary.html";
+    this._INVENTORY_PATH = "/FrontEnd/public/pages/inventory/inventory.html";
   }
 
   // Obtiene la ruta base según la estructura del proyecto.

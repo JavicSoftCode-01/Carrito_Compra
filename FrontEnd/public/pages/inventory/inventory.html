@@ -12,45 +12,18 @@
 
 <header class="navigation">
   <ul class="nav-list">
-    <li class="nav-item"><a href="../admin-panel.html" class="nav-link">Panel Admin</a></li>
-    <li class="nav-item"><a href="./inventario.html" class="nav-link active">Inventario</a></li>
-    <li class="nav-item"><a href="../index.html" class="nav-link">Inicio</a></li>
+    <li class="nav-item"><a href="../admin-panel.html" class="nav-link">Admin Panel</a></li>
+    <li class="nav-item"><a href="../inventory/inventory.html" class="nav-link active">Inventario</a></li>
+    <li class="nav-item"><a href="../products/products.html" class="nav-link">Productos</a></li>
   </ul>
 </header>
 
-<main class="inventory-main">
+<section class="inventory-main">
   <h1>Inventario de Productos</h1>
-  <div id="products-container" class="products-container">
-    <!-- Aquí se cargarán los productos de forma dinámica -->
+    <!-- Aquí se debe tener la tabla de los productos para hacer el inventario -->
   </div>
+</section>
 
-  <!-- Formulario para agregar un nuevo producto -->
-<!--  <section class="add-product">-->
-<!--    <h2>Añadir Nuevo Producto</h2>-->
-<!--    <form id="product-form">-->
-<!--      <label for="product-id">ID:</label>-->
-<!--      <input type="number" id="product-id" required>-->
-
-<!--      <label for="product-name">Nombre:</label>-->
-<!--      <input type="text" id="product-name" required>-->
-
-<!--      <label for="product-price">Precio:</label>-->
-<!--      <input type="number" id="product-price" step="0.01" required>-->
-
-<!--      <label for="product-stock">Stock:</label>-->
-<!--      <input type="number" id="product-stock" required>-->
-
-<!--      <label for="product-description">Descripción:</label>-->
-<!--      <textarea id="product-description"></textarea>-->
-
-<!--      <label for="product-imgLink">Link de Imagen:</label>-->
-<!--      <input type="url" id="product-imgLink" required>-->
-
-<!--      <button type="submit">Añadir Producto</button>-->
-<!--    </form>-->
-<!--  </section>-->
-</main>
-
-<script type="module" src="../../assets/scripts/inventory.js"></script>
+<script type="module" src="../../assets/scripts/app.js"></script>
 </body>
 </html>

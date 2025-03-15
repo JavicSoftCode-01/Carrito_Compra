@@ -1,8 +1,8 @@
 // FrontEnd/static/scripts/inventory.js
 
 // Importa las dependencias necesarias (ajusta la ruta según tu estructura)
-import Product from "../../src/models/Product";
-import { LocalStorageManager } from "../database/localStorage";
+import Product from "../../src/models/Product.js";
+import { LocalStorageManager } from "../database/localStorage.js";
 
 class InventoryPage {
   constructor() {
@@ -92,7 +92,4 @@ class InventoryPage {
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const inventoryPage = new InventoryPage();
-  inventoryPage.init();
-});
+export { InventoryPage };
