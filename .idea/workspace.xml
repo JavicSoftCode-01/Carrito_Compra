@@ -5,19 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="71f66c54-e24c-4882-bd16-582134ebabff" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/Crud/CrudGeneric.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/models/Category.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/models/Supplier.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/services/categoryServices.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/services/supplierServices.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/admin/AdminPanel.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/admin/AdminPanel.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/models/Product.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/models/Product.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/services/InventoryServices.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/services/inventoryServices.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/services/cartsServices.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/services/cartsServices.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/services/productServices.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/services/productServices.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/utils/dinamicModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/utils/dinamicModal.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/public/assets/styles/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/public/assets/styles/index.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FrontEnd/public/pages/admin-panel.html" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/public/pages/admin-panel.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -80,6 +70,7 @@
       <workItem from="1742131464993" duration="109000" />
       <workItem from="1742131624352" duration="7515000" />
       <workItem from="1742144068043" duration="104000" />
+      <workItem from="1742219115531" duration="8834000" />
     </task>
     <servers />
   </component>

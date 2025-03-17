@@ -1,123 +1,129 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Panel Administrador</title>
+
+  <!-- Estilos propios -->
   <link rel="stylesheet" href="../assets/styles/index.css">
+
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
-
 <body>
-  <div id="notification-container" class="notification-container"></div>
 
-  <nav class="navigation">
-    <ul class="nav-list">
-      <li class="nav-item"><a href="./admin-panel.html" class="nav-link">Admin Panel</a></li>
-      <li class="nav-item"><a href="./products/products.html" class="nav-link">Productos</a></li>
-      <li class="nav-item dropdown">
-        <span id="usuario-logueado" class="usuario-logueado">Usuario</span>
-        <ul id="logout-menu" class="logout-menu">
-          <a href="#" id="btn-logout" class="btn-logout">Cerrar Sesión</a>
-        </ul>
-      </li>
-    </ul>
-  </nav>
+<!-- Notificaciones -->
+<div id="notification-container" class="notification-container"></div>
 
-  <section class="admin-section">
-    <h1 class="h1">Panel de Administrador</h1>
+<!-- Barra de navegación -->
+<nav class="navigation">
+  <ul class="nav-list">
+    <li class="nav-item"><a href="./admin-panel.html" class="nav-link">Admin Panel</a></li>
+    <li class="nav-item"><a href="./products/products.html" class="nav-link">Productos</a></li>
+    <li class="nav-item dropdown">
+      <span id="usuario-logueado" class="usuario-logueado">Usuario</span>
+      <ul id="logout-menu" class="logout-menu">
+        <a href="#" id="btn-logout" class="btn-logout">Cerrar Sesión</a>
+      </ul>
+    </li>
+  </ul>
+</nav>
 
-    <!-- Modal genérico para formularios -->
-    <div id="form-modal" class="modal">
-      <div class="modal-content">
-        <span id="form-modal-close" class="modal-close">&times;</span>
-        <h2 id="form-modal-title" class="form-modal-title">Formulario</h2>
-        <div id="form-container"></div>
+<section class="admin-section">
+  <h1 class="h1">Panel de Administrador</h1>
+
+  <!-- Modal para formularios -->
+  <div id="form-modal" class="modal">
+    <div class="modal-content">
+      <span id="form-modal-close" class="modal-close">&times;</span>
+      <h2 id="form-modal-title" class="form-modal-title">Formulario</h2>
+      <div id="form-container"></div>
+    </div>
+  </div>
+
+  <!-- Modal para tablas -->
+  <div id="table-modal" class="modal">
+    <div class="modal-content">
+      <span id="table-modal-close" class="modal-close">&times;</span>
+      <h2 id="table-modal-title" class="table-modal-title">Tabla</h2>
+      <div id="table-container"></div>
+    </div>
+  </div>
+
+  <!-- Modal confirmación de eliminación -->
+  <div id="delete-confirmation-modal" class="modal">
+    <div class="modal-content">
+      <h3 id="delete-confirmation-message">¿Estás seguro de eliminar este elemento?</h3>
+      <div class="modal-buttons">
+        <button id="delete-confirm-btn" class="btn-delete">Confirmar</button>
+        <button id="delete-cancel-btn" class="btn-cancel">Cancelar</button>
       </div>
     </div>
+  </div>
 
-    <!-- Modal genérico para tablas -->
-    <div id="table-modal" class="modal">
-      <div class="modal-content">
-        <span id="table-modal-close" class="modal-close">&times;</span>
-        <h2 id="table-modal-title" class="table-modal-title">Tabla</h2>
-        <div id="table-container"></div>
-      </div>
+  <!-- Widgets -->
+  <div class="widgets-container">
+    <div class="widget">
+      <h3 class="h3">Categorías</h3>
+      <i class="fa-solid fa-tag fa-2x" title="REGISTRADAS"></i>
+      <span id="widget-total-categorias" class="widget-number"><i class="fa-solid fa-0 fa-2x"></i></span>
     </div>
-
-    <!-- Modal genérico para confirmación de eliminación -->
-    <div id="delete-confirmation-modal" class="modal">
-      <div class="modal-content">
-        <h3 id="delete-confirmation-message">¿Estás seguro de eliminar este elemento?</h3>
-        <div class="modal-buttons">
-          <button id="delete-confirm-btn" class="btn-delete">Confirmar</button>
-          <button id="delete-cancel-btn" class="btn-cancel">Cancelar</button>
-        </div>
-      </div>
+    <div class="widget">
+      <h3 class="h3">Proveedores</h3>
+      <i class="fa-solid fa-truck-field fa-2x" title="REGISTRADOS"></i>
+      <span id="widget-total-proveedores" class="widget-number"><i class="fa-solid fa-0 fa-2x"></i></span>
     </div>
-
-    <!-- Widgets -->
-    <div class="widgets-container">
-      <div class="widget">
-        <h3 class="h3">Categorías</h3>
-        <i class="fa-solid fa-tag fa-2x" title="REGISTRADAS"></i>
-        <span id="widget-total-categorias" class="widget-number"><i class="fa-solid fa-0 fa-2x"></i></span>
-      </div>
-      <div class="widget">
-        <h3 class="h3">Proveedores</h3>
-        <i class="fa-solid fa-truck-field fa-2x" title="REGISTRADOS"></i>
-        <span id="widget-total-proveedores" class="widget-number"><i class="fa-solid fa-0 fa-2x"></i></span>
-      </div>
-      <div class="widget">
-        <h3 class="h3">Tps. Productos</h3>
-        <i class="fa-solid fa-box-open fa-2x" title="REGISTRADOS"></i>
-        <span id="widget-total-productos" class="widget-number"><i class="fa-solid fa-0 fa-2x"></i></span>
-      </div>
-      <div class="widget">
-        <h3 class="h3">Capital</h3>
-        <i class="fa-solid fa-comments-dollar fa-2x" title="INVERTIDO"></i>
-        <span id="widget-total-capital" class="widget-number"><i class="fa-solid fa-0 fa-2x"></i>.00</span>
-      </div>
-      <div class="widget">
-        <h3 class="h3">P. Vendidos</h3>
-        <i class="fa-solid fa-shopping-cart fa-2x" title="VENDIDOS"></i>
-        <span id="widget-productos-vendidos" class="widget-number"><i class="fa-solid fa-0 fa-2x"></i></span>
-      </div>
-      <div class="widget">
-        <h3 class="h3">Ganancia Total</h3>
-        <i class="fa-solid fa-sack-dollar fa-2x" title="GANANCIA"></i>
-        <span id="widget-ganancia-total" class="widget-number"><i class="fa-solid fa-0 fa-2x"></i>.00</span>
-      </div>
+    <div class="widget">
+      <h3 class="h3">Tps. Productos</h3>
+      <i class="fa-solid fa-box-open fa-2x" title="REGISTRADOS"></i>
+      <span id="widget-total-productos" class="widget-number"><i class="fa-solid fa-0 fa-2x"></i></span>
     </div>
-
-    <!-- Contenedor de botones -->
-    <div class="btn-container">
-      <button id="btn-open-category-modal" class="btn-open-modal">Agregar Categoría</button>
-      <button id="btn-show-categories" class="btn-show-inventory">Ver Categorías</button>
-      
-      <button id="btn-open-supplier-modal" class="btn-open-modal">Agregar Proveedor</button>
-      <button id="btn-show-suppliers" class="btn-show-inventory">Ver Proveedores</button>
-
-      <button id="btn-open-product-modal" class="btn-open-modal">Agregar Producto</button>
-      <button id="btn-show-products" class="btn-show-inventory">Ver Productos</button>
+    <div class="widget">
+      <h3 class="h3">Capital</h3>
+      <i class="fa-solid fa-comments-dollar fa-2x" title="INVERTIDO"></i>
+      <span id="widget-total-capital" class="widget-number"><i class="fa-solid fa-0 fa-2x"></i>.00</span>
     </div>
-
-    <!-- Gráficos -->
-    <div class="chart-container">
-      <div class="chart-box">
-        <h3 class="h3">Productos Adquiridos</h3>
-        <canvas id="chart-barras"></canvas>
-      </div>
-      <div class="chart-box">
-        <h3 class="h3">Capital Invertido</h3>
-        <canvas id="chart-linea"></canvas>
-      </div>
+    <div class="widget">
+      <h3 class="h3">P. Vendidos</h3>
+      <i class="fa-solid fa-shopping-cart fa-2x" title="VENDIDOS"></i>
+      <span id="widget-productos-vendidos" class="widget-number"><i class="fa-solid fa-0 fa-2x"></i></span>
     </div>
-  </section>
+    <div class="widget">
+      <h3 class="h3">Ganancia Total</h3>
+      <i class="fa-solid fa-sack-dollar fa-2x" title="GANANCIA"></i>
+      <span id="widget-ganancia-total" class="widget-number"><i class="fa-solid fa-0 fa-2x"></i>.00</span>
+    </div>
+  </div>
 
-  <script type="module" src="../assets/scripts/app.js"></script>
+  <!-- Botones muestran modales -->
+  <div class="btn-container">
+    <button id="btn-open-category-modal" class="btn-open-modal">Agregar Categoría</button>
+    <button id="btn-show-categories" class="btn-show-inventory">Ver Categorías</button>
+
+    <button id="btn-open-supplier-modal" class="btn-open-modal">Agregar Proveedor</button>
+    <button id="btn-show-suppliers" class="btn-show-inventory">Ver Proveedores</button>
+
+    <button id="btn-open-product-modal" class="btn-open-modal">Agregar Producto</button>
+    <button id="btn-show-products" class="btn-show-inventory">Ver Productos</button>
+  </div>
+
+  <!-- Gráficos -->
+  <div class="chart-container">
+    <div class="chart-box">
+      <h3 class="h3">Productos Adquiridos</h3>
+      <canvas id="chart-barras"></canvas>
+    </div>
+    <div class="chart-box">
+      <h3 class="h3">Capital Invertido</h3>
+      <canvas id="chart-linea"></canvas>
+    </div>
+  </div>
+</section>
+
+<script type="module" src="../assets/scripts/app.js"></script>
 </body>
-
 </html>
