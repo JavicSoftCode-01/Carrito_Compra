@@ -2,7 +2,6 @@ import Product from "../../src/models/Product.js";
 import {LocalStorageManager} from "../database/localStorage.js";
 import {NotificationManager} from "../../../FrontEnd/public/assets/scripts/utils/showNotifications.js";
 import {ExecuteManager} from "../utils/execute.js";
-// import {refreshCartStockInfo} from "../../../FrontEnd/public/assets/scripts/CartManager.js";
 import {CartService} from "./cartsServices.js";
 
 class DynamicTable {

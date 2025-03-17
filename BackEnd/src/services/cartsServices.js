@@ -1,4 +1,3 @@
-// BackEnd/src/services/cartsServices.js
 import { LocalStorageManager } from "../database/localStorage.js";
 import { NotificationManager } from "../../../FrontEnd/public/assets/scripts/utils/showNotifications.js";
 import { ExecuteManager } from "../utils/execute.js";

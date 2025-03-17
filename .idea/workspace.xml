@@ -5,30 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="71f66c54-e24c-4882-bd16-582134ebabff" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/services/InventoryServices.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/services/cartsServices.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/services/productServices.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/CartManager.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/CartsPage.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FrontEnd/public/pages/carts/carts.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BackEnd/src/Crud/CrudGeneric.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BackEnd/src/models/Category.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BackEnd/src/models/Supplier.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BackEnd/src/services/categoryServices.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BackEnd/src/services/supplierServices.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BackEnd/src/admin/AdminPanel.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/admin/AdminPanel.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BackEnd/src/models/Product.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/models/Product.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/models/User.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/models/User.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/services/InventoryService.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/services/authServices.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/services/authServices.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/services/InventoryServices.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/services/inventoryServices.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/services/cartsServices.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/services/cartsServices.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/services/productServices.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/services/productServices.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/auth/login.js" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/auth/login.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/auth/register.js" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/auth/register.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/auth/utils/authForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/auth/utils/authForm.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/auth/utils/validations.js" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/auth/utils/validations.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/utils/dinamicTable.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/public/assets/styles/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/public/assets/styles/index.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FrontEnd/public/pages/admin-panel.html" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/public/pages/admin-panel.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/public/pages/auth/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/public/pages/auth/login.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/public/pages/auth/register.html" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/public/pages/auth/register.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/public/pages/inventory/inventory.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/public/pages/products/products.html" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/public/pages/products/products.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,10 +28,10 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 3
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 3
+}</component>
   <component name="ProjectId" id="2uMArWN8T5PHagl8EKV6qiEf8BB" />
   <component name="ProjectViewState">
     <option name="compactDirectories" value="true" />
@@ -51,20 +41,20 @@
     <option name="sortByType" value="true" />
     <option name="sortKey" value="BY_TYPE" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "settings.sync",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.sync&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\JavicSoftCode-01\PycharmProjects\Carrito_Compra\BackEnd\src\services" />
@@ -86,7 +76,10 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1742048273780</updated>
-      <workItem from="1742048278490" duration="22117000" />
+      <workItem from="1742048278490" duration="22325000" />
+      <workItem from="1742131464993" duration="109000" />
+      <workItem from="1742131624352" duration="7515000" />
+      <workItem from="1742144068043" duration="104000" />
     </task>
     <servers />
   </component>

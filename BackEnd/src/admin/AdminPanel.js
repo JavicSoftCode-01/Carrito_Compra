@@ -1,547 +1,784 @@
-// // BackEnd/src/admin/AdminPanel.js
-// import Product from "../../src/models/Product.js"; // Asegúrate de importarlo al inicio
-// import {InventoryService} from "../services/InventoryServices.js";
-// import {NotificationManager} from "../../../FrontEnd/public/assets/scripts/utils/showNotifications.js";
-// import {LocalStorageManager} from "../database/localStorage.js";
-//
-// class AdminPanel {
-//   constructor() {
-//     // Elementos de usuario y menú
-//     this.usuarioLogueado = document.getElementById("usuario-logueado");
-//     this.logoutMenu = document.getElementById("logout-menu");
-//
-//     // Elementos del modal para creación/edición de producto
-//     this.btnOpenModal = document.getElementById("btn-open-modal");
-//     this.modal = document.getElementById("modal");
-//     this.modalClose = document.getElementById("modal-close");
-//     this.productForm = document.getElementById("product-form");
-//     this.modalTitle = this.modal.querySelector("h2"); // Para actualizar el título
-//
-//     // Elementos del modal para mostrar la tabla de inventario
-//     this.btnShowInventory = document.getElementById("btn-show-inventory");
-//     this.inventoryModal = document.getElementById("inventory-modal");
-//     this.inventoryModalClose = document.getElementById("inventory-modal-close");
-//
-//     // Elementos del modal de confirmación para eliminación
-//     this.deleteConfirmationModal = document.getElementById("delete-confirmation-modal");
-//     this.deleteConfirmBtn = document.getElementById("delete-confirm-btn");
-//     this.deleteCancelBtn = document.getElementById("delete-cancel-btn");
-//
-//     // Estado interno para edición y eliminación
-//     this.editingProductId = null;
-//     this.productToDelete = null;
-//     // Bandera para saber si el modal de inventario estaba abierto al iniciar una edición
-//     this.fromInventoryModal = false;
-//
-//     // Se instancia el servicio de inventario (que integra la lógica de DynamicTable)
-//     this.inventoryService = new InventoryService();
-//     // Forzamos que el formulario usado en el servicio sea el del AdminPanel (modal)
-//     this.inventoryService.productForm = this.productForm;
-//   }
-//
-//   init() {
-//     this.bindEvents();
-//     // Inicializa el servicio (enlaza el formulario y prepara métodos de renderizado)
-//     this.inventoryService.init();
-//     this.loadWidgets();
-//     this.initCharts();
-//   }
-//
-//   bindEvents() {
-//     // Menú de usuario
-//     this.usuarioLogueado.addEventListener("click", () => this.toggleLogoutMenu());
-//
-//     // Modal para creación/edición de producto
-//     if (this.btnOpenModal) {
-//       this.btnOpenModal.addEventListener("click", () => this.openProductModal());
-//     }
-//     if (this.modalClose) {
-//       this.modalClose.addEventListener("click", () => this.closeProductModal());
-//     }
-//     if (this.productForm) {
-//       // Se sobreescribe el submit para incluir la lógica de creación o edición
-//       this.productForm.addEventListener("submit", (e) => {
-//         e.preventDefault();
-//         this.handleFormSubmit();
-//       });
-//     }
-//
-//     // Modal para mostrar la tabla de inventario
-//     if (this.btnShowInventory) {
-//       this.btnShowInventory.addEventListener("click", () => {
-//         this.openInventoryModal();
-//         this.renderInventoryTable();
-//       });
-//     }
-//     if (this.inventoryModalClose) {
-//       this.inventoryModalClose.addEventListener("click", () => this.closeInventoryModal());
-//     }
-//
-//     // Eventos del modal de confirmación para eliminación
-//     if (this.deleteConfirmBtn) {
-//       this.deleteConfirmBtn.addEventListener("click", () => this.confirmDeleteProduct());
-//     }
-//     if (this.deleteCancelBtn) {
-//       this.deleteCancelBtn.addEventListener("click", () => this.closeDeleteModal());
-//     }
-//     window.addEventListener("click", (e) => {
-//       if (e.target === this.inventoryModal) {
-//         this.closeInventoryModal();
-//       }
-//       if (e.target === this.deleteConfirmationModal) {
-//         this.closeDeleteModal();
-//       }
-//     });
-//   }
-//
-//   toggleLogoutMenu() {
-//     this.logoutMenu.style.display =
-//       (!this.logoutMenu.style.display || this.logoutMenu.style.display === "none")
-//         ? "block"
-//         : "none";
-//   }
-//
-//   openProductModal(product = null) {
-//     if (product) {
-//       // Se trata de una edición: se precargan los datos y se cambia el título del modal
-//       document.getElementById("product-id").value = product.id;
-//       document.getElementById("product-name").value = product.name;
-//       document.getElementById("product-price").value = product.price;
-//       document.getElementById("product-stock").value = product.stock;
-//       document.getElementById("product-description").value = product.description;
-//       document.getElementById("product-imgLink").value = product.imgLink;
-//       this.editingProductId = product.id;
-//       this.modalTitle.textContent = "Editar Producto";
-//     } else {
-//       // Se crea un nuevo producto: se limpia el formulario y se ajusta el título
-//       this.productForm.reset();
-//       this.editingProductId = null;
-//       this.modalTitle.textContent = "Crear Producto";
-//     }
-//     // Si se está editando desde el modal de inventario, lo cerramos y marcamos la bandera
-//     if (this.inventoryModal.style.display === "block") {
-//       this.closeInventoryModal();
-//       this.fromInventoryModal = true;
-//     } else {
-//       this.fromInventoryModal = false;
-//     }
-//     this.modal.style.display = "block";
-//   }
-//
-//   closeProductModal() {
-//     this.modal.style.display = "none";
-//     this.productForm.reset();
-//     this.editingProductId = null;
-//   }
-//
-//   handleFormSubmit() {
-//     // Get form values
-//     const idInput = document.getElementById("product-id").value;
-//     const nameInput = document.getElementById("product-name").value.trim();
-//     const priceInput = document.getElementById("product-price").value;
-//     const stockInput = document.getElementById("product-stock").value;
-//     const description = document.getElementById("product-description").value.trim();
-//     const imgLink = document.getElementById("product-imgLink").value.trim();
-//
-//     // Validate inputs
-//     if (!nameInput || isNaN(parseFloat(priceInput)) || isNaN(parseInt(stockInput))) {
-//       NotificationManager.error("Por favor complete todos los campos requeridos correctamente.");
-//       return;
-//     }
-//
-//     // Parse values correctly
-//     const id = idInput ? parseInt(idInput) : Date.now(); // Use timestamp as fallback ID
-//     const name = nameInput;
-//     const price = parseFloat(priceInput);
-//     const stock = parseInt(stockInput);
-//
-//     // Get products from localStorage
-//     let products = LocalStorageManager.getData("products") || [];
-//
-//     if (this.editingProductId !== null) {
-//       // Update existing product
-//       const index = products.findIndex(p => p.id === this.editingProductId);
-//       if (index !== -1) {
-//         products[index] = {id, name, price, stock, description, imgLink};
-//         NotificationManager.success("Producto actualizado correctamente.");
-//       }
-//     } else {
-//       // Create new product using the Product class
-//       const newProduct = new Product(id, name, price, stock, description, imgLink);
-//       products.push(newProduct);
-//       NotificationManager.success("Producto agregado correctamente.");
-//     }
-//
-//     // Save to localStorage
-//     LocalStorageManager.setData("products", products);
-//     this.closeProductModal();
-//     this.loadWidgets();
-//
-//     // Re-open inventory modal if editing started from there
-//     if (this.fromInventoryModal) {
-//       this.openInventoryModal();
-//     }
-//     this.renderInventoryTable();
-//   }
-//
-//   openInventoryModal() {
-//     this.inventoryModal.style.display = "block";
-//   }
-//
-//   closeInventoryModal() {
-//     this.inventoryModal.style.display = "none";
-//   }
-//
-//   renderInventoryTable() {
-//     // Se usa el método del servicio de inventario para renderizar la tabla.
-//     // Asegúrate de que en el modal exista un elemento <tbody id="compras-tbody"></tbody>
-//     this.inventoryService.renderTable();
-//     // Se adjuntan los eventos para editar/eliminar en la tabla
-//     this.attachTableActionListeners();
-//   }
-//
-//   attachTableActionListeners() {
-//     const tbody = document.getElementById("compras-tbody");
-//     if (tbody) {
-//       // Para editar
-//       tbody.querySelectorAll('.btn-edit').forEach(btn => {
-//         btn.addEventListener('click', () => {
-//           const productId = Number(btn.dataset.id);
-//           this.handleEditProduct(productId);
-//         });
-//       });
-//       // Para eliminar
-//       tbody.querySelectorAll('.btn-delete').forEach(btn => {
-//         btn.addEventListener('click', () => {
-//           const productId = Number(btn.dataset.id);
-//           this.openDeleteModal(productId);
-//         });
-//       });
-//     }
-//   }
-//
-//   handleEditProduct(productId) {
-//     const products = LocalStorageManager.getData("products") || [];
-//     const product = products.find(p => p.id === productId);
-//     if (product) {
-//       this.openProductModal(product);
-//     }
-//   }
-//
-//   openDeleteModal(productId) {
-//     this.productToDelete = productId;
-//     // Cerrar el modal de inventario y abrir el de confirmación
-//     this.closeInventoryModal();
-//     this.deleteConfirmationModal.style.display = "block";
-//   }
-//
-//   closeDeleteModal() {
-//     this.deleteConfirmationModal.style.display = "none";
-//     this.productToDelete = null;
-//     // Reabrir el modal de inventario si estaba abierto previamente
-//     this.openInventoryModal();
-//   }
-//
-//   confirmDeleteProduct() {
-//     let products = LocalStorageManager.getData("products") || [];
-//     const updatedProducts = products.filter(p => p.id !== this.productToDelete);
-//     LocalStorageManager.setData("products", updatedProducts);
-//     NotificationManager.success("Producto eliminado correctamente.");
-//     this.closeDeleteModal();
-//     this.loadWidgets();
-//     this.renderInventoryTable();
-//   }
-//
-//   loadWidgets() {
-//     const products = LocalStorageManager.getData("products") || [];
-//     const widgetProductos = document.getElementById("widget-total-productos");
-//     const widgetCapital = document.getElementById("widget-total-capital");
-//     if (widgetProductos) widgetProductos.textContent = products.length;
-//     let totalCapital = 0;
-//     products.forEach(product => {
-//       totalCapital += product.price * product.stock;
-//     });
-//     if (widgetCapital) widgetCapital.textContent = totalCapital.toFixed(2);
-//   }
-//
-//   initCharts() {
-//     const products = LocalStorageManager.getData("products") || [];
-//     const ctxBar = document.getElementById("chart-barras")?.getContext("2d");
-//     if (ctxBar) {
-//       new Chart(ctxBar, {
-//         type: 'bar',
-//         data: {
-//           labels: products.map(product => product.name),
-//           datasets: [{
-//             label: 'Stock de Productos',
-//             data: products.map(product => product.stock),
-//             backgroundColor: 'rgba(255, 99, 132, 0.5)',
-//             borderColor: 'rgba(255, 99, 132, 1)',
-//             borderWidth: 1
-//           }]
-//         },
-//         options: {scales: {y: {beginAtZero: true}}}
-//       });
-//     }
-//     const ctxLine = document.getElementById("chart-linea")?.getContext("2d");
-//     if (ctxLine) {
-//       new Chart(ctxLine, {
-//         type: 'line',
-//         data: {
-//           labels: products.map(product => product.name),
-//           datasets: [{
-//             label: 'Capital por Producto',
-//             data: products.map(product => product.price * product.stock),
-//             fill: false,
-//             borderColor: 'rgba(54, 162, 235, 1)',
-//             tension: 0.1
-//           }]
-//         },
-//         options: {scales: {y: {beginAtZero: true}}}
-//       });
-//     }
-//   }
-// }
-//
-// export default AdminPanel;
-
 // BackEnd/src/admin/AdminPanel.js
-import {InventoryService} from "../services/InventoryServices.js";
-import {NotificationManager} from "../../../FrontEnd/public/assets/scripts/utils/showNotifications.js";
-import {LocalStorageManager} from "../database/localStorage.js";
+
+import { CategoryService } from '../services/categoryServices.js';
+import { ProductService } from '../services/productServices.js';
+import { SupplierService } from '../services/supplierServices.js';
+// Se asume que LocalStorageManager se encuentra implementado en el proyecto
+import { LocalStorageManager } from '../database/localStorage.js';
+import { DynamicModal } from '../../../FrontEnd/public/assets/scripts/utils/dinamicModal.js';
+import { DynamicTable } from '../../../FrontEnd/public/assets/scripts/utils/dinamicTable.js';
+import { NotificationManager } from '../../../FrontEnd/public/assets/scripts/utils/showNotifications.js';
+
+// La librería Chart.js se carga desde el HTML
 
 class AdminPanel {
   constructor() {
-    this.usuarioLogueado = document.getElementById("usuario-logueado");
-    this.logoutMenu = document.getElementById("logout-menu");
-
-    this.btnOpenModal = document.getElementById("btn-open-modal");
-    this.modal = document.getElementById("modal");
-    this.modalClose = document.getElementById("modal-close");
-    this.productForm = document.getElementById("product-form");
-    this.modalTitle = this.modal.querySelector("h2");
-
-    this.btnShowInventory = document.getElementById("btn-show-inventory");
-    this.inventoryModal = document.getElementById("inventory-modal");
-    this.inventoryModalClose = document.getElementById("inventory-modal-close");
-
-    this.deleteConfirmationModal = document.getElementById("delete-confirmation-modal");
-    this.deleteConfirmBtn = document.getElementById("delete-confirm-btn");
-    this.deleteCancelBtn = document.getElementById("delete-cancel-btn");
-
-    // Esta propiedad se usará para diferenciar entre edición y creación
-    this.editingProductId = null;
-    this.productToDelete = null;
-    this.fromInventoryModal = false;
-
-    this.inventoryService = new InventoryService();
-    // Forzamos que el formulario del servicio sea el del AdminPanel
-    this.inventoryService.productForm = this.productForm;
-    // Sincronizamos la propiedad editingProductId
-    this.inventoryService.editingProductId = this.editingProductId;
-    // Inyectamos las funciones de UI para que el servicio las invoque
-    this.inventoryService.closeProductModal = this.closeProductModal.bind(this);
-    this.inventoryService.loadWidgets = this.loadWidgets.bind(this);
-    this.inventoryService.openInventoryModal = this.openInventoryModal.bind(this);
-    this.inventoryService.renderInventoryTable = this.renderInventoryTable.bind(this);
+    // Instanciamos los gestores de modales y tablas
+    this.modalManager = new DynamicModal();
+    this.tableManager = new DynamicTable(this.modalManager);
+    // Para almacenar el tipo de tabla actual ('product', 'category' o 'supplier')
+    this.currentTableType = null;
+    // Callback para reabrir el modal de tabla luego de cerrar el modal de formulario
+    this.lastTableModalCallback = null;
+    // Variables para guardar las instancias de los gráficos
+    this.chartBar = null;
+    this.chartLine = null;
+    this.init();
   }
 
+  /**
+   * Inicializa el panel: asocia los eventos y carga widgets y gráficos.
+   */
   init() {
-    this.bindEvents();
-    this.inventoryService.init();
+    this.bindUIActions();
     this.loadWidgets();
     this.initCharts();
   }
 
-  bindEvents() {
-    this.usuarioLogueado.addEventListener("click", () => this.toggleLogoutMenu());
-
-    if (this.btnOpenModal) {
-      this.btnOpenModal.addEventListener("click", () => this.openProductModal());
-    }
-    if (this.modalClose) {
-      this.modalClose.addEventListener("click", () => this.closeProductModal());
-    }
-    // No se vuelve a asignar el submit aquí (ya lo hace InventoryService)
-
-    if (this.btnShowInventory) {
-      this.btnShowInventory.addEventListener("click", () => {
-        this.openInventoryModal();
-        this.renderInventoryTable();
+  /**
+   * Asocia los eventos de la interfaz.
+   */
+  bindUIActions() {
+    // Botón de Cerrar Sesión
+    const btnLogout = document.getElementById("btn-logout");
+    if (btnLogout) {
+      btnLogout.addEventListener("click", () => {
+        localStorage.removeItem('currentUser');
+        window.location.href = '../index.html';
       });
     }
-    if (this.inventoryModalClose) {
-      this.inventoryModalClose.addEventListener("click", () => this.closeInventoryModal());
+
+    // Botón para Agregar Producto
+    const btnOpenProductModal = document.getElementById("btn-open-product-modal");
+    if (btnOpenProductModal) {
+      btnOpenProductModal.addEventListener("click", () => {
+        const formHTML = this.modalManager.createProductForm();
+        this.modalManager.showFormModal("Agregar Producto", formHTML);
+        this.attachCancelListener();
+        const productForm = document.getElementById("product-form");
+        if (productForm) {
+          productForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            this.handleProductFormSubmit(false);
+          }, { once: true });
+        }
+      });
     }
 
-    if (this.deleteConfirmBtn) {
-      this.deleteConfirmBtn.addEventListener("click", () => this.confirmDeleteProduct());
+    // Botón para Ver Productos
+    const btnShowProducts = document.getElementById("btn-show-products");
+    if (btnShowProducts) {
+      btnShowProducts.addEventListener("click", () => {
+        const products = ProductService.getAllProducts();
+        const categories = CategoryService.getAllCategories();
+        const suppliers = SupplierService.getAllSuppliers();
+        const tableHTML = this.tableManager.generateProductTable(
+          products,
+          categories,
+          suppliers
+        );
+        this.currentTableType = 'product';
+        this.lastTableModalCallback = () => {
+          const productsNew = ProductService.getAllProducts();
+          const categoriesNew = CategoryService.getAllCategories();
+          const suppliersNew = SupplierService.getAllSuppliers();
+          const newTableHTML = this.tableManager.generateProductTable(
+            productsNew,
+            categoriesNew,
+            suppliersNew
+          );
+          if (productsNew.length > 0) {
+            this.modalManager.showTableModal("Listado de Productos", newTableHTML);
+            this.configureTableButtons();
+          } else {
+            this.modalManager.closeTableModal();
+          }
+        };
+        this.modalManager.showTableModal("Listado de Productos", tableHTML);
+        this.configureTableButtons();
+      });
     }
-    if (this.deleteCancelBtn) {
-      this.deleteCancelBtn.addEventListener("click", () => this.closeDeleteModal());
+
+    // Botón para Agregar Categoría
+    const btnOpenCategoryModal = document.getElementById("btn-open-category-modal");
+    if (btnOpenCategoryModal) {
+      btnOpenCategoryModal.addEventListener("click", () => {
+        const formHTML = this.modalManager.createCategoryForm();
+        this.modalManager.showFormModal("Agregar Categoría", formHTML);
+        this.attachCancelListener();
+        const categoryForm = document.getElementById("category-form");
+        if (categoryForm) {
+          categoryForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            this.handleCategoryFormSubmit(false);
+          }, { once: true });
+        }
+      });
     }
-    window.addEventListener("click", (e) => {
-      if (e.target === this.inventoryModal) {
-        this.closeInventoryModal();
-      }
-      if (e.target === this.deleteConfirmationModal) {
-        this.closeDeleteModal();
-      }
+
+    // Botón para Ver Categorías
+    const btnShowCategories = document.getElementById("btn-show-categories");
+    if (btnShowCategories) {
+      btnShowCategories.addEventListener("click", () => {
+        const categories = CategoryService.getAllCategories();
+        const tableHTML = this.tableManager.generateCategoryTable(categories);
+        this.currentTableType = 'category';
+        this.lastTableModalCallback = () => {
+          const categoriesNew = CategoryService.getAllCategories();
+          const newTableHTML = this.tableManager.generateCategoryTable(categoriesNew);
+          if (categoriesNew.length > 0) {
+            this.modalManager.showTableModal("Listado de Categorías", newTableHTML);
+            this.configureTableButtons();
+          } else {
+            this.modalManager.closeTableModal();
+          }
+        };
+        this.modalManager.showTableModal("Listado de Categorías", tableHTML);
+        this.configureTableButtons();
+      });
+    }
+
+    // Botón para Agregar Proveedor
+    const btnOpenSupplierModal = document.getElementById("btn-open-supplier-modal");
+    if (btnOpenSupplierModal) {
+      btnOpenSupplierModal.addEventListener("click", () => {
+        const formHTML = this.modalManager.createSupplierForm();
+        this.modalManager.showFormModal("Agregar Proveedor", formHTML);
+        this.attachCancelListener();
+        const supplierForm = document.getElementById("supplier-form");
+        if (supplierForm) {
+          supplierForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            this.handleSupplierFormSubmit(false);
+          }, { once: true });
+        }
+      });
+    }
+
+    // Botón para Ver Proveedores
+    const btnShowSuppliers = document.getElementById("btn-show-suppliers");
+    if (btnShowSuppliers) {
+      btnShowSuppliers.addEventListener("click", () => {
+        const suppliers = SupplierService.getAllSuppliers();
+        const tableHTML = this.tableManager.generateSupplierTable(suppliers);
+        this.currentTableType = 'supplier';
+        this.lastTableModalCallback = () => {
+          const suppliersNew = SupplierService.getAllSuppliers();
+          const newTableHTML = this.tableManager.generateSupplierTable(suppliersNew);
+          if (suppliersNew.length > 0) {
+            this.modalManager.showTableModal("Listado de Proveedores", newTableHTML);
+            this.configureTableButtons();
+          } else {
+            this.modalManager.closeTableModal();
+          }
+        };
+        this.modalManager.showTableModal("Listado de Proveedores", tableHTML);
+        this.configureTableButtons();
+      });
+    }
+  }
+
+  /**
+   * Asigna listener al botón de cancelar del formulario para cerrar el modal y volver a la tabla (si aplica).
+   */
+  attachCancelListener() {
+    const cancelBtn = document.getElementById("btn-cancel");
+    if (cancelBtn) {
+      cancelBtn.addEventListener("click", () => {
+        this.modalManager.closeFormModal();
+        if (this.lastTableModalCallback) {
+          this.lastTableModalCallback();
+        }
+      }, { once: true });
+    }
+  }
+
+  /**
+   * Configura los botones de editar y eliminar de la tabla usando delegación de eventos.
+   */
+  configureTableButtons() {
+    // Asignar listeners a los botones de editar
+    const editButtons = document.querySelectorAll('.btn-edit');
+    editButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const id = button.getAttribute('data-id');
+        this.modalManager.closeTableModal();
+        if (this.currentTableType === 'category') {
+          this.handleEditCategory(id);
+        } else if (this.currentTableType === 'supplier') {
+          this.handleEditSupplier(id);
+        } else if (this.currentTableType === 'product') {
+          this.handleEditProduct(id);
+        }
+      }, { once: true });
     });
-  }
 
-  toggleLogoutMenu() {
-    this.logoutMenu.style.display =
-      (!this.logoutMenu.style.display || this.logoutMenu.style.display === "none")
-        ? "block"
-        : "none";
-  }
-
-  openProductModal(product = null) {
-    if (product) {
-      document.getElementById("product-id").value = product.id;
-      document.getElementById("product-name").value = product.name;
-      document.getElementById("product-price").value = product.price;
-      document.getElementById("product-stock").value = product.stock;
-      document.getElementById("product-description").value = product.description;
-      document.getElementById("product-imgLink").value = product.imgLink;
-      this.editingProductId = product.id;
-      this.modalTitle.textContent = "Editar Producto";
-    } else {
-      this.productForm.reset();
-      this.editingProductId = null;
-      this.modalTitle.textContent = "Crear Producto";
-    }
-    // Sincronizamos con el servicio
-    this.inventoryService.editingProductId = this.editingProductId;
-
-    if (this.inventoryModal.style.display === "block") {
-      this.closeInventoryModal();
-      this.fromInventoryModal = true;
-    } else {
-      this.fromInventoryModal = false;
-    }
-    this.modal.style.display = "block";
-  }
-
-  closeProductModal() {
-    this.modal.style.display = "none";
-    this.productForm.reset();
-    this.editingProductId = null;
-    // Actualizamos la propiedad del servicio
-    this.inventoryService.editingProductId = null;
-  }
-
-  openInventoryModal() {
-    this.inventoryModal.style.display = "block";
-  }
-
-  closeInventoryModal() {
-    this.inventoryModal.style.display = "none";
-  }
-
-  renderInventoryTable() {
-    this.inventoryService.renderTable();
-    this.attachTableActionListeners();
-  }
-
-  attachTableActionListeners() {
-    const tbody = document.getElementById("compras-tbody");
-    if (tbody) {
-      tbody.querySelectorAll('.btn-edit').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const productId = Number(btn.dataset.id);
-          this.handleEditProduct(productId);
-        });
-      });
-      tbody.querySelectorAll('.btn-delete').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const productId = Number(btn.dataset.id);
-          this.openDeleteModal(productId);
-        });
+    // Delegación para el botón de eliminar en el contenedor de la tabla
+    const tableContainer = document.getElementById('table-container');
+    if (tableContainer) {
+      tableContainer.addEventListener('click', (e) => {
+        const deleteButton = e.target.closest('.btn-delete');
+        if (deleteButton) {
+          const id = deleteButton.getAttribute('data-id');
+          this.modalManager.closeTableModal();
+          // Llamar directamente al método de eliminación según el tipo
+          if (this.currentTableType === 'category') {
+            this.handleDeleteCategory(id);
+          } else if (this.currentTableType === 'supplier') {
+            this.handleDeleteSupplier(id);
+          } else if (this.currentTableType === 'product') {
+            this.handleDeleteProduct(id);
+          }
+        }
       });
     }
   }
 
-  handleEditProduct(productId) {
-    const products = LocalStorageManager.getData("products") || [];
-    const product = products.find(p => p.id === productId);
-    if (product) {
-      this.openProductModal(product);
+  /**
+   * Ejecuta el callback para reabrir la tabla (previa edición o eliminación) si existe.
+   */
+  reopenTableModal() {
+    if (this.lastTableModalCallback) {
+      this.lastTableModalCallback();
+      this.lastTableModalCallback = null;
     }
   }
 
-  openDeleteModal(productId) {
-    this.productToDelete = productId;
-    this.closeInventoryModal();
-    this.deleteConfirmationModal.style.display = "block";
-  }
-
-  closeDeleteModal() {
-    this.deleteConfirmationModal.style.display = "none";
-    this.productToDelete = null;
-    this.openInventoryModal();
-  }
-
-  confirmDeleteProduct() {
-    let products = LocalStorageManager.getData("products") || [];
-    const updatedProducts = products.filter(p => p.id !== this.productToDelete);
-    LocalStorageManager.setData("products", updatedProducts);
-    NotificationManager.success("Producto eliminado correctamente.");
-    this.closeDeleteModal();
-    this.loadWidgets();
-    this.renderInventoryTable();
-  }
+  /**
+   * Actualiza los widgets con datos actuales.
+   */
+  //loadWidgets() {
+  //  const products = ProductService.getAllProducts();
+  //  const categories = CategoryService.getAllCategories();
+  //  const suppliers = SupplierService.getAllSuppliers();
+//
+  //  const productsCountElement = document.getElementById('widget-total-productos');
+  //  const categoriesCountElement = document.getElementById('widget-total-categorias');
+  //  const suppliersCountElement = document.getElementById('widget-total-proveedores');
+  //  const inventoryValueElement = document.getElementById('widget-total-capital');
+  //  const capitalInvertidoElement = document.getElementById('widget-capital-invertido');
+  //  const productosVendidosElement = document.getElementById('widget-productos-vendidos');
+  //  const gananciaTotalElement = document.getElementById('widget-ganancia-total');
+//
+  //  if (productsCountElement) productsCountElement.textContent = products.length;
+  //  if (categoriesCountElement) categoriesCountElement.textContent = categories.length;
+  //  if (suppliersCountElement) suppliersCountElement.textContent = suppliers.length;
+//
+  //  const inventoryValue = products.reduce((total, product) => {
+  //    return total + (parseFloat(product.price) * parseInt(product.stock));
+  //  }, 0);
+  //  if (inventoryValueElement) {
+  //    inventoryValueElement.textContent = `${inventoryValue.toFixed(2)}`;
+  //  }
+//
+  //  const capitalInvertido = products.reduce((total, product) => {
+  //    return total + (parseFloat(product.price) * parseInt(product.quantity));
+  //  }, 0);
+  //  if (capitalInvertidoElement) {
+  //    capitalInvertidoElement.textContent = `${capitalInvertido.toFixed(2)}`;
+  //  }
+//
+  //  const productosVendidos = products.reduce((sum, product) => {
+  //    return sum + (parseInt(product.quantity) - parseInt(product.stock));
+  //  }, 0);
+  //  if (productosVendidosElement) {
+  //    productosVendidosElement.textContent = productosVendidos;
+  //  }
+//
+  //  const gananciaTotal = products.reduce((sum, product) => {
+  //    return sum + ((parseInt(product.quantity) - parseInt(product.stock)) * parseFloat(product.pvp));
+  //  }, 0);
+  //  if (gananciaTotalElement) {
+  //    gananciaTotalElement.textContent = `${gananciaTotal.toFixed(2)}`;
+  //  }
+  //}
 
   loadWidgets() {
-    const products = LocalStorageManager.getData("products") || [];
-    const widgetProductos = document.getElementById("widget-total-productos");
-    const widgetCapital = document.getElementById("widget-total-capital");
-    if (widgetProductos) widgetProductos.textContent = products.length;
-    let totalCapital = 0;
-    products.forEach(product => {
-      totalCapital += product.price * product.stock;
-    });
-    if (widgetCapital) widgetCapital.textContent = totalCapital.toFixed(2);
+    const products = ProductService.getAllProducts();
+    const categories = CategoryService.getAllCategories();
+    const suppliers = SupplierService.getAllSuppliers();
+  
+    const productsCountElement = document.getElementById('widget-total-productos');
+    const categoriesCountElement = document.getElementById('widget-total-categorias');
+    const suppliersCountElement = document.getElementById('widget-total-proveedores');
+    const inventoryValueElement = document.getElementById('widget-total-capital');
+    
+    // Añadir los widgets nuevos
+    const productosVendidosElement = document.getElementById('widget-productos-vendidos');
+    const gananciaTotalElement = document.getElementById('widget-ganancia-total');
+  
+    if (productsCountElement) productsCountElement.textContent = products.length;
+    if (categoriesCountElement) categoriesCountElement.textContent = categories.length;
+    if (suppliersCountElement) suppliersCountElement.textContent = suppliers.length;
+  
+    // Cálculo del valor total del inventario (capital actual)
+    const inventoryValue = products.reduce((total, product) => {
+      return total + (parseFloat(product.price) * parseInt(product.stock));
+    }, 0);
+    if (inventoryValueElement) {
+      inventoryValueElement.textContent = `${inventoryValue.toFixed(2)}`;
+    }
+  
+    // Cálculo del capital invertido
+    const capitalInvertido = products.reduce((total, product) => {
+      return total + (parseFloat(product.price) * parseInt(product.quantity));
+    }, 0);
+    
+    // Cálculo de productos vendidos
+    const productosVendidos = products.reduce((sum, product) => {
+      return sum + (parseInt(product.quantity) - parseInt(product.stock));
+    }, 0);
+    if (productosVendidosElement) {
+      productosVendidosElement.textContent = productosVendidos;
+    }
+  
+    // Cálculo de ganancias totales
+    const gananciaTotal = products.reduce((sum, product) => {
+      return sum + ((parseInt(product.quantity) - parseInt(product.stock)) * parseFloat(product.pvp));
+    }, 0);
+    if (gananciaTotalElement) {
+      gananciaTotalElement.textContent = `${gananciaTotal.toFixed(2)}`;
+    }
   }
 
+
+  /**
+   * Inicializa los gráficos usando Chart.js.
+   */
   initCharts() {
     const products = LocalStorageManager.getData("products") || [];
     const ctxBar = document.getElementById("chart-barras")?.getContext("2d");
     if (ctxBar) {
-      new Chart(ctxBar, {
+      if (this.chartBar) {
+        this.chartBar.destroy();
+      }
+      this.chartBar = new Chart(ctxBar, {
         type: 'bar',
         data: {
           labels: products.map(product => product.name),
           datasets: [{
-            label: 'Stock de Productos',
-            data: products.map(product => product.stock),
-            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            label: 'Productos Adquiridos',
+            data: products.map(product => product.quantity),
+            backgroundColor: '#FFADDE',
             borderColor: 'rgba(255, 99, 132, 1)',
             borderWidth: 1
           }]
         },
-        options: {scales: {y: {beginAtZero: true}}}
+        options: { 
+          scales: { 
+            y: { beginAtZero: true } 
+          },
+          onHover: (event, chartElement) => {
+            const canvas = event?.native?.target;
+            if (chartElement.length) {
+              canvas.style.cursor = "pointer";
+            } else {
+              canvas.style.cursor = "default";
+            }
+          }
+        }
       });
+      
     }
     const ctxLine = document.getElementById("chart-linea")?.getContext("2d");
     if (ctxLine) {
-      new Chart(ctxLine, {
+      if (this.chartLine) {
+        this.chartLine.destroy();
+      }
+      this.chartLine = new Chart(ctxLine, {
         type: 'line',
         data: {
           labels: products.map(product => product.name),
           datasets: [{
-            label: 'Capital por Producto',
-            data: products.map(product => product.price * product.stock),
+            label: 'Capital Invertido',
+            data: products.map(product => product.price * product.quantity),
             fill: false,
             borderColor: 'rgba(54, 162, 235, 1)',
-            tension: 0.1
+            tension: 0.1,
+            pointRadius: 10,  // Aumenta el tamaño de los puntos
+            pointHoverRadius: 12  // Aumenta el tamaño al pasar el mouse
           }]
         },
-        options: {scales: {y: {beginAtZero: true}}}
-      });
+        options: { 
+          scales: { 
+            y: { beginAtZero: true } 
+          },
+          onHover: (event, chartElement) => {
+            const canvas = event?.native?.target;
+            if (chartElement.length) {
+              canvas.style.cursor = "pointer";
+            } else {
+              canvas.style.cursor = "default";
+            }
+          }
+        }
+      });      
+    }
+  }
+
+  /**
+   * Maneja el envío del formulario de Producto.
+   * @param {boolean} isEdit Indica si es edición (true) o creación (false)
+   */
+//  handleProductFormSubmit(isEdit) {
+//    const productId = document.getElementById('product-id').value;
+//    const name = document.getElementById('product-name').value;
+//    const price = document.getElementById('product-price').value;
+//    const quantity = document.getElementById('product-quantity').value;
+//    const pvp = document.getElementById('product-pvp').value;
+//    const stock = document.getElementById('product-stock').value;
+//    const categoryId = document.getElementById('product-category').value || null;
+//    const supplierId = document.getElementById('product-supplier').value || null;
+//    const description = document.getElementById('product-description').value;
+//    const imgLink = document.getElementById('product-imgLink').value;
+//  
+//    let success = false;
+//    if (productId) {
+//      success = ProductService.updateProduct(productId, {
+//        name,
+//        price: parseFloat(price),
+//        quantity: parseInt(quantity),
+//        pvp: parseFloat(pvp),
+//        stock: parseInt(stock),
+//        categoryId,
+//        supplierId,
+//        description,
+//        imgLink
+//      });
+//      if (success) {
+//        NotificationManager.success('Producto actualizado correctamente');
+//      }
+//    } else {
+//      success = ProductService.createProduct(
+//        name,
+//        price,
+//        quantity,
+//        pvp,
+//        stock,
+//        categoryId,
+//        supplierId,
+//        description,
+//        imgLink
+//      );
+//      if (success) {
+//        NotificationManager.success('Producto creado correctamente');
+//      }
+//    }
+//    if (success) {
+//      this.modalManager.closeFormModal();
+//      this.loadWidgets();
+//      this.initCharts();
+//      if (isEdit && this.lastTableModalCallback) {
+//        this.lastTableModalCallback();
+//      }
+//    }
+//  }
+handleProductFormSubmit(isEdit) {
+  const productId = document.getElementById('product-id').value;
+  const name = document.getElementById('product-name').value;
+  const price = document.getElementById('product-price').value;
+  const quantity = document.getElementById('product-quantity').value;
+  const pvp = document.getElementById('product-pvp').value;
+  
+  // Use quantity value for stock if stock field doesn't exist
+  let stock;
+  const stockField = document.getElementById('product-stock');
+  if (stockField) {
+    stock = stockField.value;
+  } else {
+    // Si el campo stock no existe, usar el valor de quantity
+    stock = quantity;
+  }
+  
+  const categoryId = document.getElementById('product-category').value || null;
+  const supplierId = document.getElementById('product-supplier').value || null;
+  const description = document.getElementById('product-description').value;
+  const imgLink = document.getElementById('product-imgLink').value;
+
+  let success = false;
+  if (productId) {
+    success = ProductService.updateProduct(productId, {
+      name,
+      price: parseFloat(price),
+      quantity: parseInt(quantity),
+      pvp: parseFloat(pvp),
+      stock: parseInt(stock),
+      categoryId,
+      supplierId,
+      description,
+      imgLink
+    });
+    if (success) {
+      NotificationManager.success('Producto actualizado correctamente');
+    }
+  } else {
+    // Para productos nuevos, usar quantity como valor inicial de stock
+    success = ProductService.createProduct(
+      name,
+      price,
+      quantity,
+      pvp,
+      quantity, // Usar quantity como valor inicial de stock para productos nuevos
+      categoryId,
+      supplierId,
+      description,
+      imgLink
+    );
+    if (success) {
+      NotificationManager.success('Producto creado correctamente');
+    }
+  }
+  if (success) {
+    this.modalManager.closeFormModal();
+    this.loadWidgets();
+    this.initCharts();
+    if (isEdit && this.lastTableModalCallback) {
+      this.lastTableModalCallback();
     }
   }
 }
 
-export default AdminPanel;
+  /**
+   * Maneja el envío del formulario de Categoría.
+   * @param {boolean} isEdit Indica si es edición (true) o creación (false)
+   */
+  handleCategoryFormSubmit(isEdit) {
+    const categoryId = document.getElementById('category-id').value;
+    const name = document.getElementById('category-name').value;
+    const description = document.getElementById('category-description').value;
+    let success = false;
+    if (categoryId) {
+      success = CategoryService.updateCategory(categoryId, { name, description });
+      if (success) {
+        NotificationManager.success('Categoría actualizada correctamente');
+      }
+    } else {
+      success = CategoryService.createCategory(name, description);
+      if (success) {
+        NotificationManager.success('Categoría creada correctamente');
+      }
+    }
+    if (success) {
+      this.modalManager.closeFormModal();
+      this.loadWidgets();
+      if (isEdit && this.lastTableModalCallback) {
+        this.lastTableModalCallback();
+      }
+    }
+  }
+
+  /**
+   * Maneja el envío del formulario de Proveedor.
+   * @param {boolean} isEdit Indica si es edición (true) o creación (false)
+   */
+  handleSupplierFormSubmit(isEdit) {
+    const supplierId = document.getElementById('supplier-id').value;
+    const name = document.getElementById('supplier-name').value;
+    const phone = document.getElementById('supplier-phone').value;
+    const email = document.getElementById('supplier-email').value;
+    const address = document.getElementById('supplier-address').value;
+    let success = false;
+    if (supplierId) {
+      success = SupplierService.updateSupplier(supplierId, { name, phone, email, address });
+      if (success) {
+        NotificationManager.success('Proveedor actualizado correctamente');
+      }
+    } else {
+      success = SupplierService.createSupplier(name, phone, email, address);
+      if (success) {
+        NotificationManager.success('Proveedor creado correctamente');
+      }
+    }
+    if (success) {
+      this.modalManager.closeFormModal();
+      this.loadWidgets();
+      if (isEdit && this.lastTableModalCallback) {
+        this.lastTableModalCallback();
+      }
+    }
+  }
+
+  /**
+   * Maneja la edición de un Producto.
+   */
+  handleEditProduct(id) {
+    this.lastTableModalCallback = () => {
+      const productsNew = ProductService.getAllProducts();
+      const categoriesNew = CategoryService.getAllCategories();
+      const suppliersNew = SupplierService.getAllSuppliers();
+      const newTableHTML = this.tableManager.generateProductTable(
+        productsNew,
+        categoriesNew,
+        suppliersNew
+      );
+      if (productsNew.length > 0) {
+        this.modalManager.showTableModal("Listado de Productos", newTableHTML);
+        this.configureTableButtons();
+      } else {
+        this.modalManager.closeTableModal();
+      }
+    };
+    this.modalManager.closeTableModal();
+    const product = ProductService.getProductById(id);
+    if (product) {
+      const formHTML = this.modalManager.updateProductForm(product);
+      this.modalManager.showFormModal("Editar Producto", formHTML);
+      this.attachCancelListener();
+      const productForm = document.getElementById("product-form");
+      if (productForm) {
+        productForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          this.handleProductFormSubmit(true);
+        }, { once: true });
+      }
+    }
+  }
+
+  /**
+   * Maneja la eliminación de un Producto.
+   */
+  handleDeleteProduct(id) {
+    this.modalManager.showDeleteModal("¿Estás seguro de que deseas eliminar este producto?", () => {
+      const success = ProductService.deleteProduct(id);
+      if (success) {
+        NotificationManager.success('Producto eliminado correctamente');
+      } else {
+        NotificationManager.error('No se puede eliminar el producto porque está en uso.');
+      }
+      this.loadWidgets();
+      this.initCharts();
+      this.modalManager.closeDeleteModal();
+      if (ProductService.getAllProducts().length > 0 && this.lastTableModalCallback) {
+        this.lastTableModalCallback();
+      }
+    });
+    // Listener para el botón cancelar en el modal de eliminación
+    const deleteCancelBtn = document.getElementById("delete-cancel-btn");
+    if (deleteCancelBtn) {
+      deleteCancelBtn.addEventListener("click", () => {
+        this.modalManager.closeDeleteModal();
+        if (this.lastTableModalCallback) {
+          this.lastTableModalCallback();
+        }
+      }, { once: true });
+    }
+  }
+
+  /**
+   * Maneja la edición de una Categoría.
+   */
+  handleEditCategory(id) {
+    this.lastTableModalCallback = () => {
+      const categoriesNew = CategoryService.getAllCategories();
+      const newTableHTML = this.tableManager.generateCategoryTable(categoriesNew);
+      if (categoriesNew.length > 0) {
+        this.modalManager.showTableModal("Listado de Categorías", newTableHTML);
+        this.configureTableButtons();
+      } else {
+        this.modalManager.closeTableModal();
+      }
+    };
+    this.modalManager.closeTableModal();
+    const category = CategoryService.getCategoryById(id);
+    if (category) {
+      const formHTML = this.modalManager.createCategoryForm(category);
+      this.modalManager.showFormModal("Editar Categoría", formHTML);
+      this.attachCancelListener();
+      const categoryForm = document.getElementById("category-form");
+      if (categoryForm) {
+        categoryForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          this.handleCategoryFormSubmit(true);
+        }, { once: true });
+      }
+    }
+  }
+
+  /**
+   * Maneja la eliminación de una Categoría.
+   */
+  handleDeleteCategory(id) {
+    this.modalManager.showDeleteModal("¿Estás seguro de que deseas eliminar esta categoría?", () => {
+      const success = CategoryService.deleteCategory(id);
+      if (success) {
+        NotificationManager.success('Categoría eliminada correctamente');
+      } else {
+        NotificationManager.error('No se puede eliminar la categoría porque está en uso.');
+      }
+      this.loadWidgets();
+      this.modalManager.closeDeleteModal();
+      if (CategoryService.getAllCategories().length > 0 && this.lastTableModalCallback) {
+        this.lastTableModalCallback();
+      }
+    });
+    const deleteCancelBtn = document.getElementById("delete-cancel-btn");
+    if (deleteCancelBtn) {
+      deleteCancelBtn.addEventListener("click", () => {
+        this.modalManager.closeDeleteModal();
+        if (this.lastTableModalCallback) {
+          this.lastTableModalCallback();
+        }
+      }, { once: true });
+    }
+  }
+
+  /**
+   * Maneja la edición de un Proveedor.
+   */
+  handleEditSupplier(id) {
+    this.lastTableModalCallback = () => {
+      const suppliersNew = SupplierService.getAllSuppliers();
+      const newTableHTML = this.tableManager.generateSupplierTable(suppliersNew);
+      if (suppliersNew.length > 0) {
+        this.modalManager.showTableModal("Listado de Proveedores", newTableHTML);
+        this.configureTableButtons();
+      } else {
+        this.modalManager.closeTableModal();
+      }
+    };
+    this.modalManager.closeTableModal();
+    const supplier = SupplierService.getSupplierById(id);
+    if (supplier) {
+      const formHTML = this.modalManager.createSupplierForm(supplier);
+      this.modalManager.showFormModal("Editar Proveedor", formHTML);
+      this.attachCancelListener();
+      const supplierForm = document.getElementById("supplier-form");
+      if (supplierForm) {
+        supplierForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          this.handleSupplierFormSubmit(true);
+        }, { once: true });
+      }
+    }
+  }
+
+  /**
+   * Maneja la eliminación de un Proveedor.
+   */
+  handleDeleteSupplier(id) {
+    this.modalManager.showDeleteModal("¿Estás seguro de que deseas eliminar este proveedor?", () => {
+      const success = SupplierService.deleteSupplier(id);
+      if (success) {
+        NotificationManager.success('Proveedor eliminado correctamente');
+      } else {
+        NotificationManager.error('No se puede eliminar el proveedor porque está en uso.');
+      }
+      this.loadWidgets();
+      this.modalManager.closeDeleteModal();
+      if (SupplierService.getAllSuppliers().length > 0 && this.lastTableModalCallback) {
+        this.lastTableModalCallback();
+      }
+    });
+    const deleteCancelBtn = document.getElementById("delete-cancel-btn");
+    if (deleteCancelBtn) {
+      deleteCancelBtn.addEventListener("click", () => {
+        this.modalManager.closeDeleteModal();
+        if (this.lastTableModalCallback) {
+          this.lastTableModalCallback();
+        }
+      }, { once: true });
+    }
+  }
+}
+
+export { AdminPanel };
