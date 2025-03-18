@@ -5,20 +5,298 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Carrito de Compras</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="x-icon" href="https://scontent.fgye18-1.fna.fbcdn.net/v/t39.30808-6/480962230_2104527913355478_3903980125125728011_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=833d8c&_nc_ohc=cVMMkK8rIJsQ7kNvgEqZL6P&_nc_zt=23&_nc_ht=scontent.fgye18-1.fna&_nc_gid=XxTDNP0acGI5lua_YlU0-w&oh=00_AYEnWHk5OLZd9XYq14C2pD0W9FZLCLwJ9-NvWFOIRtzyYg&oe=67DE9593">
+
+  <!-- Estilos Propios -->
   <link rel="stylesheet" href="../../../public/assets/styles/index.css"/>
+
   <!-- Incluir Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+  <style>
+    .cart-layout {
+      display: flex;
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+
+    .cart-items {
+      flex: 1;
+    }
+
+    .cart-summary {
+      flex: 0 0 35%;
+      background-color: #f9f9f9;
+      border-radius: 15px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      height: fit-content;
+      position: sticky;
+      top: 20px;
+    }
+
+    .cart-card {
+      display: flex;
+      background-color: white;
+      border-radius: 15px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      position: relative;
+    }
+
+    .cart-img {
+      flex: 0 0 30%;
+      padding-right: 1.5rem;
+    }
+
+    .cart-img img {
+      width: 100%;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .cart-details {
+      flex: 1;
+      display: flex;
+    }
+
+    .cart-info {
+      flex: 1;
+    }
+
+    .cart-price {
+      flex: 0 0 30%;
+      padding-left: 1rem;
+    }
+
+    .product-name {
+      font-size: 1.2rem;
+      margin: 0 0 0.5rem 0;
+      color: #333;
+    }
+
+    .product-category {
+      font-size: 0.9rem;
+      color: #888;
+      margin: 0 0 0.5rem 0;
+    }
+
+    .product-description {
+      font-size: 0.9rem;
+      color: #555;
+      margin: 0.5rem 0;
+      line-height: 1.4;
+    }
+
+    .product-price {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #ff6b6b;
+      margin: 0 0 0.5rem 0;
+    }
+
+    .product-stock {
+      font-size: 0.9rem;
+      color: #888;
+      margin: 0.5rem 0;
+    }
+
+    .quantity-control {
+      display: flex;
+      align-items: center;
+      margin: 1rem 0;
+    }
+
+    .quantity-btn {
+      width: 30px;
+      height: 30px;
+      background-color: #f0f0f0;
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .quantity-btn:hover {
+      background-color: #e0e0e0;
+    }
+
+    .quantity-input {
+      width: 40px;
+      text-align: center;
+      border: none;
+      background: transparent;
+      font-size: 1rem;
+      margin: 0 0.5rem;
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      color: #ff6b6b;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: transform 0.2s;
+    }
+
+    .delete-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .invoice-header {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #eee;
+    }
+
+    .invoice-title {
+      font-size: 1.3rem;
+      margin: 0 0 1rem 0;
+      color: #333;
+    }
+
+    .invoice-details {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .invoice-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+
+    .invoice-table th, .invoice-table td {
+      text-align: left;
+      padding: 0.5rem;
+      border-bottom: 1px solid #eee;
+    }
+
+    .invoice-table th {
+      color: #888;
+      font-weight: normal;
+    }
+
+    .total-section {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #eee;
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 0.5rem 0;
+    }
+
+    .total-label {
+      color: #666;
+    }
+
+    .total-value {
+      font-weight: bold;
+    }
+
+    .grand-total {
+      font-size: 1.2rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #eee;
+    }
+
+    .iva-control {
+      display: flex;
+      align-items: center;
+      margin: 0.5rem 0;
+    }
+
+    .iva-input {
+      width: 60px;
+      text-align: center;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 0.3rem;
+      margin-left: 0.5rem;
+    }
+
+    .clear-cart-btn {
+      background-color: #ff6b6b;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 0.8rem 1.5rem;
+      margin-top: 1rem;
+      width: 100%;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      font-weight: bold;
+    }
+
+    .clear-cart-btn:hover {
+      background-color: #ff5252;
+    }
+
+    .empty-cart {
+      text-align: center;
+      padding: 3rem;
+      color: #888;
+    }
+
+    .empty-cart i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: #ddd;
+    }
+
+    @media (max-width: 768px) {
+      .cart-layout {
+        flex-direction: column;
+      }
+
+      .cart-card {
+        flex-direction: column;
+      }
+
+      .cart-img {
+        flex: 0 0 100%;
+        padding-right: 0;
+        margin-bottom: 1rem;
+      }
+
+      .cart-details {
+        flex-direction: column;
+      }
+
+      .cart-price {
+        padding-left: 0;
+        margin-top: 1rem;
+      }
+    }
+  </style>
 </head>
 <body>
+
+<!-- Contenedor de notificaciones -->
 <div id="notification-container" class="notification-container"></div>
 
+<!-- Barra de Navegación -->
 <nav class="navigation">
   <ul class="nav-list">
     <li class="nav-item"><a href="../admin-panel.html" class="nav-link">Admin Panel</a></li>
     <li class="nav-item"><a href="../products/products.html" class="nav-link">Productos</a></li>
     <li class="nav-item dropdown">
-      <a href="../carts/carts.html" id="btn-cart" style="margin-right:20px;"><i class="fa-solid fa-cart-shopping"></i>
-      </a>
+      <a href="../carts/carts.html" id="btn-cart" style="margin-right:20px;"><i class="fa-solid fa-cart-shopping fa-lg"></i></a>
       <span id="usuario-logueado" class="usuario-logueado">Usuario</span>
       <ul id="logout-menu" class="logout-menu">
         <a href="#" id="btn-logout" class="btn-logout">Cerrar Sesión</a>
@@ -27,14 +305,20 @@
   </ul>
 </nav>
 
+<!-- Contenedor Principal -->
 <section class="carts-main">
-  <h1>Mi Carrito de Compras</h1>
-  <!-- Contenedor para los productos del carrito -->
-  <div id="cart-container" class="cart-container"></div>
-  <!-- Sección de resumen: total y botón para vaciar el carrito -->
-  <div id="cart-summary" class="cart-summary" style="margin-top:20px; text-align:center;"></div>
+  <h1 style="text-align: center; margin: 2rem 0;">Mi Carrito de Compras</h1>
+
+  <div class="cart-layout">
+    <!-- Contenedor para los productos del carrito -->
+    <div id="cart-container" class="cart-items"></div>
+
+    <!-- Sección de resumen / factura -->
+    <div id="cart-summary" class="cart-summary"></div>
+  </div>
 </section>
 
 <script type="module" src="../../assets/scripts/app.js"></script>
+
 </body>
 </html>

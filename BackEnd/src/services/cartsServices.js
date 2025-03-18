@@ -63,7 +63,8 @@ class CartService {
           stock: currentStock,
           quantity: quantity,
           description: product.description,
-          imgLink: product.imgLink
+          imgLink: product.imgLink,
+          category: product.category || "General" // Añadido para mostrar la categoría
         });
       }
       // Actualiza el stock en el almacenamiento principal
@@ -81,10 +82,16 @@ class CartService {
       if (index !== -1) {
         const currentQuantity = cart[index].quantity;
         const quantityChange = newQuantity - currentQuantity;
+
         if (newQuantity <= 0) {
-          CartService.removeFromCart(productId);
+          // Programar eliminación después de 5 segundos
+          NotificationManager.warning(`En 5 segundos este producto "${cart[index].name}" será eliminado de sus compras.`);
+          setTimeout(() => {
+            CartService.removeFromCart(productId);
+          }, 5000);
           return;
         }
+
         if (quantityChange > 0) {
           const availableStock = CartService.checkAvailableStock(productId);
           if (quantityChange > availableStock) {
@@ -143,6 +150,10 @@ class CartService {
       const product = products.find(p => p.id === item.id);
       if (product) {
         item.stock = product.stock;
+        // Asegurarse de que el producto tenga categoría
+        if (!item.category && product.category) {
+          item.category = product.category;
+        }
       }
       return item;
     });
@@ -154,6 +165,7 @@ class CartsPage {
   constructor() {
     this.cartContainer = document.getElementById("cart-container");
     this.cartSummary = document.getElementById("cart-summary");
+    this.ivaRate = 12; // Valor predeterminado de IVA
   }
 
   init() {
@@ -163,84 +175,197 @@ class CartsPage {
     }, "Carrito de compras inicializado", "Error al inicializar el carrito de compras");
   }
 
+  generateInvoiceNumber() {
+    return Math.floor(10000000 + Math.random() * 90000000).toString();
+  }
+
+  getCurrentDateTime() {
+    const now = new Date();
+    const options = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    };
+    return now.toLocaleDateString('es-ES', options);
+  }
+
   renderCart() {
     return ExecuteManager.execute(() => {
       const cart = CartService.getCart();
       // Actualiza la información de stock para cada producto en el carrito
       CartService.refreshCartStockInfo();
+
       this.cartContainer.innerHTML = "";
+
       if (cart.length === 0) {
-        this.cartContainer.innerHTML = "<p style='text-align:center;'>Sin compras</p>";
+        this.cartContainer.innerHTML = `
+          <div class="empty-cart">
+            <i class="fas fa-shopping-basket"></i>
+            <p>Tu carrito está vacío</p>
+            <p>¡Agrega algunos productos increíbles!</p>
+          </div>
+        `;
         this.cartSummary.innerHTML = "";
         return;
       }
-      // Se obtienen los productos para conocer el stock actual
-      const products = LocalStorageManager.getData(PRODUCTS_KEY) || [];
+
+      // Renderizar cada producto en el carrito
       cart.forEach(item => {
-        const currentProduct = products.find(p => p.id === item.id);
-        const currentStock = currentProduct ? currentProduct.stock : 0;
         const card = document.createElement("div");
         card.className = "cart-card";
-        card.style.border = "1px solid #ddd";
-        card.style.padding = "15px";
-        card.style.marginBottom = "15px";
-        card.style.display = "flex";
-        card.style.justifyContent = "space-between";
-        card.style.alignItems = "center";
+
         card.innerHTML = `
-          <div style="display: flex; align-items: flex-start;">
-            <div style="flex: 0 0 40%; padding-right: 20px;">
-              <img src="${item.imgLink}" alt="${item.name}" style="width: 100%; max-width: 150px; display: block;">
-            </div>
-            <div style="flex: 1;">
-              <h2 style="margin-top: 0;">${item.name}</h2>
-              <p>Precio: $${Number(item.price).toFixed(2)}</p>
-              <p>Cantidad: 
-                <input type="number" min="1" max="${item.quantity + currentStock}" value="${item.quantity}" data-id="${item.id}" class="cart-quantity" style="width:60px;">
-              </p>
-              <p>Stock actual: ${currentStock}</p>
-            </div>
-            <button class="btn-remove" data-id="${item.id}" style="background-color:red; color:#fff; border:none; padding:10px; border-radius:4px; cursor:pointer; margin-top: 10px;">
-              Eliminar
-            </button>
+          <div class="cart-img">
+            <img src="${item.imgLink}" alt="${item.name}">
           </div>
+          <div class="cart-details">
+            <div class="cart-info">
+              <h3 class="product-name">${item.name}</h3>
+              <p class="product-category">${item.category || 'General'}</p>
+              <p class="product-description">${item.description}</p>
+            </div>
+            <div class="cart-price">
+              <p class="product-price">$${Number(item.price).toFixed(2)}</p>
+              <p class="product-stock">Stock disponible: ${item.stock}</p>
+              <div class="quantity-control">
+                <button class="quantity-btn decrease-btn" data-id="${item.id}"><i class="fas fa-minus"></i></button>
+                <input type="text" class="quantity-input" value="${item.quantity}" data-id="${item.id}" readonly>
+                <button class="quantity-btn increase-btn" data-id="${item.id}"><i class="fas fa-plus"></i></button>
+              </div>
+            </div>
+          </div>
+          <button class="delete-btn" data-id="${item.id}"><i class="fas fa-trash"></i></button>
         `;
+
         this.cartContainer.appendChild(card);
       });
-      const total = CartService.getCartTotal();
-      this.cartSummary.innerHTML = `
-        <h2>Total: $${total.toFixed(2)}</h2>
-        <button id="btn-clear-cart" style="background-color:#ff9aa2; color:#fff; border:none; padding:10px 20px; border-radius:4px; cursor:pointer;">
-          Vaciar carrito de compra
-        </button>
-      `;
+
+      // Renderizar resumen de factura
+      this.renderInvoiceSummary(cart);
+
+      // Adjuntar eventos
       this.attachEvents();
+
     }, "Carrito renderizado", "Error al renderizar el carrito");
   }
 
+  renderInvoiceSummary(cart) {
+    const subtotal = CartService.getCartTotal();
+    const iva = (subtotal * this.ivaRate) / 100;
+    const total = subtotal + iva;
+
+    // Obtener nombre del usuario
+    const userData = LocalStorageManager.getData("currentUser") || {};
+    const userName = userData.fullName || "Cliente";
+
+    this.cartSummary.innerHTML = `
+      <div class="invoice-header">
+        <h2 class="invoice-title">Resumen de Compra</h2>
+        <div class="invoice-details">
+          <p>Cliente: ${userName}</p>
+          <p>Factura #: ${this.generateInvoiceNumber()}</p>
+          <p>Fecha: ${this.getCurrentDateTime()}</p>
+        </div>
+      </div>
+      
+      <h3 style="margin-top: 0">Detalle de Factura</h3>
+      
+      <table class="invoice-table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Cant.</th>
+            <th>Precio</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${cart.map(item => `
+            <tr>
+              <td>${item.name}</td>
+              <td>${item.quantity}</td>
+              <td>$${Number(item.price).toFixed(2)}</td>
+              <td>$${(item.price * item.quantity).toFixed(2)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      
+      <div class="total-section">
+        <div class="total-row">
+          <span class="total-label">Subtotal:</span>
+          <span class="total-value">$${subtotal.toFixed(2)}</span>
+        </div>
+        
+        <div class="total-row">
+          <span class="total-label">
+            IVA:
+            <div class="iva-control">
+              <input type="number" id="iva-rate" class="iva-input" value="${this.ivaRate}" min="0" max="100">%
+            </div>
+          </span>
+          <span class="total-value">$${iva.toFixed(2)}</span>
+        </div>
+        
+        <div class="total-row grand-total">
+          <span class="total-label">Total:</span>
+          <span class="total-value">$${total.toFixed(2)}</span>
+        </div>
+      </div>
+      
+      <button id="btn-clear-cart" class="clear-cart-btn">
+        <i class="fas fa-trash-alt"></i> Vaciar carrito
+      </button>
+    `;
+  }
+
   attachEvents() {
-    // Asigna eventos a los inputs de cantidad
-    this.cartContainer.querySelectorAll(".cart-quantity").forEach(input => {
-      input.addEventListener("change", (e) => {
-        const newQuantity = parseInt(e.target.value);
-        const productId = Number(e.target.dataset.id);
+    // Eventos para los botones de incrementar/decrementar cantidad
+    this.cartContainer.querySelectorAll(".increase-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const productId = Number(btn.dataset.id);
+        const quantityInput = this.cartContainer.querySelector(`.quantity-input[data-id="${productId}"]`);
+        const newQuantity = parseInt(quantityInput.value) + 1;
         CartService.updateCart(productId, newQuantity);
         this.renderCart();
       });
     });
+
+    this.cartContainer.querySelectorAll(".decrease-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const productId = Number(btn.dataset.id);
+        const quantityInput = this.cartContainer.querySelector(`.quantity-input[data-id="${productId}"]`);
+        const newQuantity = parseInt(quantityInput.value) - 1;
+        CartService.updateCart(productId, newQuantity);
+        this.renderCart();
+      });
+    });
+
     // Evento para eliminar producto
-    this.cartContainer.querySelectorAll(".btn-remove").forEach(btn => {
+    this.cartContainer.querySelectorAll(".delete-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         const productId = Number(btn.dataset.id);
         CartService.removeFromCart(productId);
         this.renderCart();
       });
     });
+
     // Evento para vaciar el carrito
     const clearBtn = document.getElementById("btn-clear-cart");
     if (clearBtn) {
       clearBtn.addEventListener("click", () => {
         CartService.clearCart();
+        this.renderCart();
+      });
+    }
+
+    // Evento para cambiar el IVA
+    const ivaInput = document.getElementById("iva-rate");
+    if (ivaInput) {
+      ivaInput.addEventListener("change", (e) => {
+        this.ivaRate = parseFloat(e.target.value);
         this.renderCart();
       });
     }

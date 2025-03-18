@@ -682,6 +682,7 @@ body {
     margin-bottom: 20px;
     /*border: 1px solid #eee;*/
     border: 1px solid #FDEBFD;
+    cursor: pointer;
 }
 
 .product-card:hover {
@@ -773,8 +774,10 @@ body {
 
 .product-category {
     font-size: 0.8rem;
-    color: #727272;
+    color: #696969;
     margin-top: 5px;
+    font-weight: bold;
+    text-decoration: underline;
 }
 
 .product-cart-control {
