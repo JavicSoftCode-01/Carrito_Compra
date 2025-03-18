@@ -6,8 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="71f66c54-e24c-4882-bd16-582134ebabff" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/models/User.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/models/User.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/services/cardsProductServices.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/services/cardsProductServices.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BackEnd/src/services/cartsServices.js" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/services/cartsServices.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/public/assets/scripts/app.js" afterDir="false" />
     </list>
