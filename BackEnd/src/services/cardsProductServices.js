@@ -185,48 +185,6 @@ class CardsProductService {
   }
 
   /**
-   * Agrega la cantidad seleccionada al carrito (confirma la compra) y actualiza el stock en localStorage
-   * @param {string} productId - ID del producto
-   */
-  // addToCart(productId) {
-  //   const product = this.products.find(p => p.id === productId);
-  //   if (!product) return;
-  //
-  //   const selectedQuantity = this.getCartQuantity(productId);
-  //
-  //   // Si no se ha seleccionado cantidad, se muestra "Agregar producto"
-  //   if (selectedQuantity === 0) {
-  //     NotificationManager.warning('Agregar producto');
-  //     return;
-  //   }
-  //
-  //   // Verificar que la cantidad seleccionada no exceda el stock disponible
-  //   if (selectedQuantity > product.stock) {
-  //     NotificationManager.warning(`Producto "${product.name}" con stock insuficiente, disponemos (${product.stock}) productos`);
-  //     return;
-  //   }
-  //
-  //   // Acumular la cantidad confirmada (si se han agregado previamente, se suma)
-  //   if (!this.confirmedCart[productId]) {
-  //     this.confirmedCart[productId] = 0;
-  //   }
-  //   this.confirmedCart[productId] += selectedQuantity;
-  //
-  //   // Reducir el stock del producto en base a la cantidad confirmada
-  //   product.stock -= selectedQuantity;
-  //
-  //   // Actualizar el localStorage para que el stock modificado persista
-  //   this.updateLocalStorage();
-  //
-  //   // Reiniciar la cantidad seleccionada para ese producto
-  //   delete this.cartItems[productId];
-  //   this.updateProductCard(productId);
-  //
-  //   NotificationManager.success(`Producto "${product.name}" agregado (${this.confirmedCart[productId]}) veces`);
-  // }
-
-
-  /**
    * Agrega la cantidad seleccionada al carrito y actualiza el stock
    * @param {string} productId - ID del producto
    */
@@ -258,41 +216,6 @@ class CardsProductService {
     delete this.cartItems[productId];
     this.updateProductCard(productId);
   }
-
-
-  /**
-   * Agrega la cantidad seleccionada al carrito y actualiza el stock
-   * @param {string} productId - ID del producto
-   */
-  // addToCart(productId) {
-  //   const product = this.products.find(p => p.id === productId);
-  //   if (!product) return;
-  //
-  //   const selectedQuantity = this.getCartQuantity(productId);
-  //
-  //   // Si no se ha seleccionado cantidad, se muestra "Agregar producto"
-  //   if (selectedQuantity === 0) {
-  //     NotificationManager.warning('Agregar producto');
-  //     return;
-  //   }
-  //
-  //   // Verificar que la cantidad seleccionada no exceda el stock disponible
-  //   if (selectedQuantity > product.stock) {
-  //     NotificationManager.warning(`Producto "${product.name}" con stock insuficiente, disponemos (${product.stock}) productos`);
-  //     return;
-  //   }
-  //
-  //   // Importar CartService si aún no está disponible
-  //
-  //   // Usar CartService para agregar al carrito
-  //   CartService.addToCart(product, selectedQuantity);
-  //
-  //    this.updateLocalStorage();
-  //
-  //   // Reiniciar la cantidad seleccionada para ese producto
-  //   delete this.cartItems[productId];
-  //   this.updateProductCard(productId);
-  // }
 
   /**
    * Actualiza la visualización de una card de producto

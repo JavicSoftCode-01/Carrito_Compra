@@ -91,7 +91,7 @@ class CartsPage {
               ${item.quantity <= 0 ? '<p class="removal-notice">Se eliminará en <span class="countdown">5</span> segundos</p>' : ''}
             </div>
           </div>
-          <button class="delete-btn" data-id="${item.id}"><i class="fas fa-trash"></i></button>
+          <a class="btn delete-btn" data-id="${item.id}"><i class="fas fa-trash fa-lg"></i></a>
         `;
 
         this.cartContainer.appendChild(card);
@@ -532,11 +532,16 @@ class CartService {
         }
 
         // Verificar si la cantidad en carrito es mayor que el stock disponible
-        if (item.quantity > product.stock) {
-          // Adjust quantity if more than available
-          item.quantity = product.stock > 0 ? product.stock : 0;
-          updated = true;
-          NotificationManager.warning(`Cantidad de "${item.name}" ajustada al stock disponible.`);
+        // if (item.quantity > product.stock) {
+        //   // Adjust quantity if more than available
+        //   item.quantity = product.stock > 0 ? product.stock : 0;
+        //   updated = true;
+        //   NotificationManager.warning(`Cantidad de "${item.name}" ajustada al stock disponible.`);
+        // }
+        if (product) {
+          item.stock = product.stock;
+          // NotificationManager.warning(`Cantidad de "${item.name}" ajustada al stock disponible.`);
+
         }
       }
       return item;
