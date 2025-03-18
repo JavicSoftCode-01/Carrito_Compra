@@ -1,13 +1,13 @@
 // BackEnd/src/admin/AdminPanel.js
 
-import { CategoryService } from '../services/categoryServices.js';
-import { ProductService } from '../services/productServices.js';
-import { SupplierService } from '../services/supplierServices.js';
+import {CategoryService} from '../services/categoryServices.js';
+import {ProductService} from '../services/productServices.js';
+import {SupplierService} from '../services/supplierServices.js';
 // Se asume que LocalStorageManager se encuentra implementado en el proyecto
-import { LocalStorageManager } from '../database/localStorage.js';
-import { DynamicModal } from '../../../FrontEnd/public/assets/scripts/utils/dinamicModal.js';
-import { DynamicTable } from '../../../FrontEnd/public/assets/scripts/utils/dinamicTable.js';
-import { NotificationManager } from '../../../FrontEnd/public/assets/scripts/utils/showNotifications.js';
+import {LocalStorageManager} from '../database/localStorage.js';
+import {DynamicModal} from '../../../FrontEnd/public/assets/scripts/utils/dinamicModal.js';
+import {DynamicTable} from '../../../FrontEnd/public/assets/scripts/utils/dinamicTable.js';
+import {NotificationManager} from '../../../FrontEnd/public/assets/scripts/utils/showNotifications.js';
 
 // La librería Chart.js se carga desde el HTML
 
@@ -39,15 +39,6 @@ class AdminPanel {
    * Asocia los eventos de la interfaz.
    */
   bindUIActions() {
-    // Botón de Cerrar Sesión
-    const btnLogout = document.getElementById("btn-logout");
-    if (btnLogout) {
-      btnLogout.addEventListener("click", () => {
-        localStorage.removeItem('currentUser');
-        window.location.href = '../index.html';
-      });
-    }
-
     // Botón para Agregar Producto
     const btnOpenProductModal = document.getElementById("btn-open-product-modal");
     if (btnOpenProductModal) {
@@ -60,7 +51,7 @@ class AdminPanel {
           productForm.addEventListener("submit", (e) => {
             e.preventDefault();
             this.handleProductFormSubmit(false);
-          }, { once: true });
+          }, {once: true});
         }
       });
     }
@@ -111,7 +102,7 @@ class AdminPanel {
           categoryForm.addEventListener("submit", (e) => {
             e.preventDefault();
             this.handleCategoryFormSubmit(false);
-          }, { once: true });
+          }, {once: true});
         }
       });
     }
@@ -150,7 +141,7 @@ class AdminPanel {
           supplierForm.addEventListener("submit", (e) => {
             e.preventDefault();
             this.handleSupplierFormSubmit(false);
-          }, { once: true });
+          }, {once: true});
         }
       });
     }
@@ -189,7 +180,7 @@ class AdminPanel {
         if (this.lastTableModalCallback) {
           this.lastTableModalCallback();
         }
-      }, { once: true });
+      }, {once: true});
     }
   }
 
@@ -210,7 +201,7 @@ class AdminPanel {
         } else if (this.currentTableType === 'product') {
           this.handleEditProduct(id);
         }
-      }, { once: true });
+      }, {once: true});
     });
 
     // Delegación para el botón de eliminar en el contenedor de la tabla
@@ -297,20 +288,20 @@ class AdminPanel {
     const products = ProductService.getAllProducts();
     const categories = CategoryService.getAllCategories();
     const suppliers = SupplierService.getAllSuppliers();
-  
+
     const productsCountElement = document.getElementById('widget-total-productos');
     const categoriesCountElement = document.getElementById('widget-total-categorias');
     const suppliersCountElement = document.getElementById('widget-total-proveedores');
     const inventoryValueElement = document.getElementById('widget-total-capital');
-    
+
     // Añadir los widgets nuevos
     const productosVendidosElement = document.getElementById('widget-productos-vendidos');
     const gananciaTotalElement = document.getElementById('widget-ganancia-total');
-  
+
     if (productsCountElement) productsCountElement.textContent = products.length;
     if (categoriesCountElement) categoriesCountElement.textContent = categories.length;
     if (suppliersCountElement) suppliersCountElement.textContent = suppliers.length;
-  
+
     // Cálculo del valor total del inventario (capital actual)
     const inventoryValue = products.reduce((total, product) => {
       return total + (parseFloat(product.price) * parseInt(product.stock));
@@ -318,12 +309,12 @@ class AdminPanel {
     if (inventoryValueElement) {
       inventoryValueElement.textContent = `${inventoryValue.toFixed(2)}`;
     }
-  
+
     // Cálculo del capital invertido
     const capitalInvertido = products.reduce((total, product) => {
       return total + (parseFloat(product.price) * parseInt(product.quantity));
     }, 0);
-    
+
     // Cálculo de productos vendidos
     const productosVendidos = products.reduce((sum, product) => {
       return sum + (parseInt(product.quantity) - parseInt(product.stock));
@@ -331,7 +322,7 @@ class AdminPanel {
     if (productosVendidosElement) {
       productosVendidosElement.textContent = productosVendidos;
     }
-  
+
     // Cálculo de ganancias totales
     const gananciaTotal = products.reduce((sum, product) => {
       return sum + ((parseInt(product.quantity) - parseInt(product.stock)) * parseFloat(product.pvp));
@@ -364,9 +355,9 @@ class AdminPanel {
             borderWidth: 1
           }]
         },
-        options: { 
-          scales: { 
-            y: { beginAtZero: true } 
+        options: {
+          scales: {
+            y: {beginAtZero: true}
           },
           onHover: (event, chartElement) => {
             const canvas = event?.native?.target;
@@ -378,7 +369,7 @@ class AdminPanel {
           }
         }
       });
-      
+
     }
     const ctxLine = document.getElementById("chart-linea")?.getContext("2d");
     if (ctxLine) {
@@ -399,9 +390,9 @@ class AdminPanel {
             pointHoverRadius: 12  // Aumenta el tamaño al pasar el mouse
           }]
         },
-        options: { 
-          scales: { 
-            y: { beginAtZero: true } 
+        options: {
+          scales: {
+            y: {beginAtZero: true}
           },
           onHover: (event, chartElement) => {
             const canvas = event?.native?.target;
@@ -412,7 +403,7 @@ class AdminPanel {
             }
           }
         }
-      });      
+      });
     }
   }
 
@@ -431,7 +422,7 @@ class AdminPanel {
 //    const supplierId = document.getElementById('product-supplier').value || null;
 //    const description = document.getElementById('product-description').value;
 //    const imgLink = document.getElementById('product-imgLink').value;
-//  
+//
 //    let success = false;
 //    if (productId) {
 //      success = ProductService.updateProduct(productId, {
@@ -473,70 +464,70 @@ class AdminPanel {
 //      }
 //    }
 //  }
-handleProductFormSubmit(isEdit) {
-  const productId = document.getElementById('product-id').value;
-  const name = document.getElementById('product-name').value;
-  const price = document.getElementById('product-price').value;
-  const quantity = document.getElementById('product-quantity').value;
-  const pvp = document.getElementById('product-pvp').value;
-  
-  // Use quantity value for stock if stock field doesn't exist
-  let stock;
-  const stockField = document.getElementById('product-stock');
-  if (stockField) {
-    stock = stockField.value;
-  } else {
-    // Si el campo stock no existe, usar el valor de quantity
-    stock = quantity;
-  }
-  
-  const categoryId = document.getElementById('product-category').value || null;
-  const supplierId = document.getElementById('product-supplier').value || null;
-  const description = document.getElementById('product-description').value;
-  const imgLink = document.getElementById('product-imgLink').value;
+  handleProductFormSubmit(isEdit) {
+    const productId = document.getElementById('product-id').value;
+    const name = document.getElementById('product-name').value;
+    const price = document.getElementById('product-price').value;
+    const quantity = document.getElementById('product-quantity').value;
+    const pvp = document.getElementById('product-pvp').value;
 
-  let success = false;
-  if (productId) {
-    success = ProductService.updateProduct(productId, {
-      name,
-      price: parseFloat(price),
-      quantity: parseInt(quantity),
-      pvp: parseFloat(pvp),
-      stock: parseInt(stock),
-      categoryId,
-      supplierId,
-      description,
-      imgLink
-    });
-    if (success) {
-      NotificationManager.success('Producto actualizado correctamente');
+    // Use quantity value for stock if stock field doesn't exist
+    let stock;
+    const stockField = document.getElementById('product-stock');
+    if (stockField) {
+      stock = stockField.value;
+    } else {
+      // Si el campo stock no existe, usar el valor de quantity
+      stock = quantity;
     }
-  } else {
-    // Para productos nuevos, usar quantity como valor inicial de stock
-    success = ProductService.createProduct(
-      name,
-      price,
-      quantity,
-      pvp,
-      quantity, // Usar quantity como valor inicial de stock para productos nuevos
-      categoryId,
-      supplierId,
-      description,
-      imgLink
-    );
+
+    const categoryId = document.getElementById('product-category').value || null;
+    const supplierId = document.getElementById('product-supplier').value || null;
+    const description = document.getElementById('product-description').value;
+    const imgLink = document.getElementById('product-imgLink').value;
+
+    let success = false;
+    if (productId) {
+      success = ProductService.updateProduct(productId, {
+        name,
+        price: parseFloat(price),
+        quantity: parseInt(quantity),
+        pvp: parseFloat(pvp),
+        stock: parseInt(stock),
+        categoryId,
+        supplierId,
+        description,
+        imgLink
+      });
+      if (success) {
+        NotificationManager.success('Producto actualizado correctamente');
+      }
+    } else {
+      // Para productos nuevos, usar quantity como valor inicial de stock
+      success = ProductService.createProduct(
+        name,
+        price,
+        quantity,
+        pvp,
+        quantity, // Usar quantity como valor inicial de stock para productos nuevos
+        categoryId,
+        supplierId,
+        description,
+        imgLink
+      );
+      if (success) {
+        NotificationManager.success('Producto creado correctamente');
+      }
+    }
     if (success) {
-      NotificationManager.success('Producto creado correctamente');
+      this.modalManager.closeFormModal();
+      this.loadWidgets();
+      this.initCharts();
+      if (isEdit && this.lastTableModalCallback) {
+        this.lastTableModalCallback();
+      }
     }
   }
-  if (success) {
-    this.modalManager.closeFormModal();
-    this.loadWidgets();
-    this.initCharts();
-    if (isEdit && this.lastTableModalCallback) {
-      this.lastTableModalCallback();
-    }
-  }
-}
 
   /**
    * Maneja el envío del formulario de Categoría.
@@ -548,7 +539,7 @@ handleProductFormSubmit(isEdit) {
     const description = document.getElementById('category-description').value;
     let success = false;
     if (categoryId) {
-      success = CategoryService.updateCategory(categoryId, { name, description });
+      success = CategoryService.updateCategory(categoryId, {name, description});
       if (success) {
         NotificationManager.success('Categoría actualizada correctamente');
       }
@@ -579,7 +570,7 @@ handleProductFormSubmit(isEdit) {
     const address = document.getElementById('supplier-address').value;
     let success = false;
     if (supplierId) {
-      success = SupplierService.updateSupplier(supplierId, { name, phone, email, address });
+      success = SupplierService.updateSupplier(supplierId, {name, phone, email, address});
       if (success) {
         NotificationManager.success('Proveedor actualizado correctamente');
       }
@@ -629,7 +620,7 @@ handleProductFormSubmit(isEdit) {
         productForm.addEventListener("submit", (e) => {
           e.preventDefault();
           this.handleProductFormSubmit(true);
-        }, { once: true });
+        }, {once: true});
       }
     }
   }
@@ -660,7 +651,7 @@ handleProductFormSubmit(isEdit) {
         if (this.lastTableModalCallback) {
           this.lastTableModalCallback();
         }
-      }, { once: true });
+      }, {once: true});
     }
   }
 
@@ -689,7 +680,7 @@ handleProductFormSubmit(isEdit) {
         categoryForm.addEventListener("submit", (e) => {
           e.preventDefault();
           this.handleCategoryFormSubmit(true);
-        }, { once: true });
+        }, {once: true});
       }
     }
   }
@@ -718,7 +709,7 @@ handleProductFormSubmit(isEdit) {
         if (this.lastTableModalCallback) {
           this.lastTableModalCallback();
         }
-      }, { once: true });
+      }, {once: true});
     }
   }
 
@@ -747,7 +738,7 @@ handleProductFormSubmit(isEdit) {
         supplierForm.addEventListener("submit", (e) => {
           e.preventDefault();
           this.handleSupplierFormSubmit(true);
-        }, { once: true });
+        }, {once: true});
       }
     }
   }
@@ -776,9 +767,9 @@ handleProductFormSubmit(isEdit) {
         if (this.lastTableModalCallback) {
           this.lastTableModalCallback();
         }
-      }, { once: true });
+      }, {once: true});
     }
   }
 }
 
-export { AdminPanel };
+export {AdminPanel};

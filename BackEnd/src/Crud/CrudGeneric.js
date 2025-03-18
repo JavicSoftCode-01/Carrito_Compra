@@ -32,10 +32,12 @@ class CrudGeneric {
       const result = LocalStorageManager.create(storageKey, data);
 
       if (result) {
-        NotificationManager.success(`Registro creado exitosamente`);
+        // NotificationManager.success(`Registro creado exitosamente`);
+        console.log("Registro creado exitosamente");
         return true;
       } else {
-        NotificationManager.error("No se pudo crear el registro");
+        console.log("No se pudo crear el registro");
+        //NotificationManager.error("No se pudo crear el registro");
         return false;
       }
     }, null, "Error al crear el registro:") ?? false;
@@ -72,7 +74,8 @@ class CrudGeneric {
       const record = data.find(item => item[idField] === id);
 
       if (!record) {
-        NotificationManager.warning(`No se encontró el registro con ${idField}=${id}`);
+        console.log("No se encontró el registro con", idField, "=", id);
+        //NotificationManager.warning(`No se encontró el registro con ${idField}=${id}`);
         return null;
       }
 
@@ -100,7 +103,8 @@ class CrudGeneric {
       // Verificar si el registro existe
       const existingRecord = this.readById(storageKey, id, idField);
       if (!existingRecord) {
-        NotificationManager.error(`No se encontró el registro con ${idField}=${id} para actualizar`);
+        console.log("No se encontró el registro con", idField, "=", id, "para actualizar");
+        //NotificationManager.error(`No se encontró el registro con ${idField}=${id} para actualizar`);
         return false;
       }
 
@@ -108,10 +112,12 @@ class CrudGeneric {
       const result = LocalStorageManager.update(storageKey, id, data, idField);
 
       if (result) {
-        NotificationManager.success(`Registro actualizado exitosamente`);
+        console.log("Registro actualizado exitosamente");
+        //NotificationManager.success(`Registro actualizado exitosamente`);
         return true;
       } else {
-        NotificationManager.error("No se pudo actualizar el registro");
+        console.log("No se pudo actualizar el registro");
+        //NotificationManager.error("No se pudo actualizar el registro");
         return false;
       }
     }, null, "Error al actualizar el registro:") ?? false;
@@ -129,7 +135,8 @@ class CrudGeneric {
       // Verificar si el registro existe
       const existingRecord = this.readById(storageKey, id, idField);
       if (!existingRecord) {
-        NotificationManager.error(`No se encontró el registro con ${idField}=${id} para eliminar`);
+        console.log("No se encontró el registro con", idField, "=", id, "para eliminar");
+        //NotificationManager.error(`No se encontró el registro con ${idField}=${id} para eliminar`);
         return false;
       }
 
@@ -137,10 +144,12 @@ class CrudGeneric {
       const result = LocalStorageManager.delete(storageKey, id, idField);
 
       if (result) {
-        NotificationManager.success(`Registro eliminado exitosamente`);
+        console.log("Registro eliminado exitosamente");
+        //NotificationManager.success(`Registro eliminado exitosamente`);
         return true;
       } else {
-        NotificationManager.error("No se pudo eliminar el registro");
+        console.log("No se pudo eliminar el registro");
+        //NotificationManager.error("No se pudo eliminar el registro");
         return false;
       }
     }, null, "Error al eliminar el registro:") ?? false;

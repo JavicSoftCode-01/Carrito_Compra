@@ -11,6 +11,10 @@ class AuthManager {
     this._ADMIN_PANEL_PATH = "/FrontEnd/public/pages/admin-panel.html";
   }
 
+  init() {
+    this.initNameUserLogout();
+  }
+
   getBasePath() {
     return ExecuteManager.execute(() => {
       const path = window.location.pathname;
@@ -51,7 +55,7 @@ class AuthManager {
             NotificationManager.info("Su sesión ha expirado. Por favor, inicie sesión nuevamente.");
             setTimeout(() => {
               this.redirectTo(this._LOGIN_PATH);
-            }, 2000);
+            }, 1500);
             return false;
           }
           return true;
@@ -120,7 +124,7 @@ class AuthManager {
       NotificationManager.success("Bienvenido! " + this.getUserFullName());
       setTimeout(() => {
         this.redirectTo(this._ADMIN_PANEL_PATH);
-      }, 1000);
+      }, 1500);
     }, "Éxito! Al iniciar sesión.", "Error! Al iniciar sesión:");
   }
 
@@ -133,7 +137,7 @@ class AuthManager {
       NotificationManager.success("Exito! Cerrando Sesion");
       setTimeout(() => {
         this.redirectTo(this._LOGIN_PATH);
-      }, 1000);
+      }, 1500);
     }, "Éxito! Al cerrar sesión.", "Error! Al cerrar sesión:");
   }
 
@@ -146,6 +150,30 @@ class AuthManager {
       "Exito! Al obtener la sesión.",
       "Error! Al obtener la sesión:"
     );
+  }
+
+  /** Muestra nombres completos del usuario logueado y manejo de cerrar sesión */
+  initNameUserLogout() {
+    // Actualiza el nombre del usuario en la barra de navegación
+    const usuarioDisplay = document.getElementById("usuario-logueado");
+    if (usuarioDisplay) {
+      usuarioDisplay.textContent = AuthManager.getUserFullName();
+
+      // Maneja el toggle del menú de logout
+      const logoutMenu = document.getElementById("logout-menu");
+      usuarioDisplay.addEventListener("click", () => {
+        logoutMenu.classList.toggle("visible");
+      });
+    }
+
+    // Asocia el botón de logout a la función correspondiente
+    const btnLogout = document.getElementById("btn-logout");
+    if (btnLogout) {
+      btnLogout.addEventListener("click", (e) => {
+        e.preventDefault();
+        AuthManager.logout();
+      });
+    }
   }
 }
 
