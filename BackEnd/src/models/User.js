@@ -12,6 +12,10 @@ class User {
     this.username = username;
     this.password = password;
   }
+
+  fullName() {
+    return `${this.first_name} ${this.last_name}`;
+  }
 }
 
 export {User};

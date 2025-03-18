@@ -1,6 +1,7 @@
-import { LocalStorageManager } from "../database/localStorage.js";
-import { NotificationManager } from "../../../FrontEnd/public/assets/scripts/utils/showNotifications.js";
-import { ExecuteManager } from "../utils/execute.js";
+import {LocalStorageManager} from "../database/localStorage.js";
+import {NotificationManager} from "../../../FrontEnd/public/assets/scripts/utils/showNotifications.js";
+import {ExecuteManager} from "../utils/execute.js";
+import {AuthManager} from "./authServices.js";
 
 const CART_KEY = "cart";
 const PRODUCTS_KEY = "products";
@@ -60,11 +61,11 @@ class CartService {
           id: product.id,
           name: product.name,
           price: product.price,
-          stock: currentStock,
+          stock: currentStock - quantity, // Update stock correctly
           quantity: quantity,
           description: product.description,
           imgLink: product.imgLink,
-          category: product.category || "General" // Añadido para mostrar la categoría
+          category: product.category || "General"
         });
       }
       // Actualiza el stock en el almacenamiento principal
@@ -73,6 +74,7 @@ class CartService {
       NotificationManager.success("Producto agregado al carrito.");
     }, "Producto agregado al carrito", "Error al agregar producto al carrito");
   }
+
 
   // Actualiza la cantidad de un producto en el carrito
   static updateCart(productId, newQuantity) {
@@ -84,11 +86,8 @@ class CartService {
         const quantityChange = newQuantity - currentQuantity;
 
         if (newQuantity <= 0) {
-          // Programar eliminación después de 5 segundos
-          NotificationManager.warning(`En 5 segundos este producto "${cart[index].name}" será eliminado de sus compras.`);
-          setTimeout(() => {
-            CartService.removeFromCart(productId);
-          }, 5000);
+          // Eliminar producto inmediatamente si la cantidad es 0 o menor
+          CartService.removeFromCart(productId);
           return;
         }
 
@@ -99,10 +98,14 @@ class CartService {
             return;
           }
         }
+
         // Actualiza el stock en el almacenamiento principal
         CartService.updateProductStock(productId, -quantityChange);
         cart[index].quantity = newQuantity;
+
+        // Actualizar el stock en el item del carrito para mostrar el valor correcto
         cart[index].stock = CartService.checkAvailableStock(productId);
+
         CartService.saveCart(cart);
         NotificationManager.success("Cantidad actualizada.");
       }
@@ -146,18 +149,35 @@ class CartService {
   static refreshCartStockInfo() {
     let cart = CartService.getCart();
     const products = LocalStorageManager.getData(PRODUCTS_KEY) || [];
+
+    let updated = false;
     cart = cart.map(item => {
       const product = products.find(p => p.id === item.id);
       if (product) {
+        // The stock shown in cart should be the AVAILABLE stock (after subtracting what's in cart)
         item.stock = product.stock;
+
         // Asegurarse de que el producto tenga categoría
         if (!item.category && product.category) {
           item.category = product.category;
         }
+
+        // Verificar si la cantidad en carrito es mayor que el stock disponible
+        if (item.quantity > product.stock) {
+          // Adjust quantity if more than available
+          item.quantity = product.stock > 0 ? product.stock : 0;
+          updated = true;
+          NotificationManager.warning(`Cantidad de "${item.name}" ajustada al stock disponible.`);
+        }
       }
       return item;
     });
-    CartService.saveCart(cart);
+
+    if (updated) {
+      CartService.saveCart(cart);
+    }
+
+    return cart;
   }
 }
 
@@ -166,6 +186,7 @@ class CartsPage {
     this.cartContainer = document.getElementById("cart-container");
     this.cartSummary = document.getElementById("cart-summary");
     this.ivaRate = 12; // Valor predeterminado de IVA
+    this.invoiceNumber = this.generateInvoiceNumber();
   }
 
   init() {
@@ -201,12 +222,12 @@ class CartsPage {
 
       if (cart.length === 0) {
         this.cartContainer.innerHTML = `
-          <div class="empty-cart">
-            <i class="fas fa-shopping-basket"></i>
-            <p>Tu carrito está vacío</p>
-            <p>¡Agrega algunos productos increíbles!</p>
-          </div>
-        `;
+  <div class="empty-cart">
+    <i class="fas fa-shopping-basket"></i>
+    <p>Tu carrito está vacío</p>
+    <p>¡Agrega algunos productos increíbles!</p>
+  </div>
+`;
         this.cartSummary.innerHTML = "";
         return;
       }
@@ -215,30 +236,28 @@ class CartsPage {
       cart.forEach(item => {
         const card = document.createElement("div");
         card.className = "cart-card";
-
         card.innerHTML = `
-          <div class="cart-img">
-            <img src="${item.imgLink}" alt="${item.name}">
-          </div>
-          <div class="cart-details">
-            <div class="cart-info">
-              <h3 class="product-name">${item.name}</h3>
-              <p class="product-category">${item.category || 'General'}</p>
-              <p class="product-description">${item.description}</p>
-            </div>
-            <div class="cart-price">
-              <p class="product-price">$${Number(item.price).toFixed(2)}</p>
-              <p class="product-stock">Stock disponible: ${item.stock}</p>
-              <div class="quantity-control">
-                <button class="quantity-btn decrease-btn" data-id="${item.id}"><i class="fas fa-minus"></i></button>
-                <input type="text" class="quantity-input" value="${item.quantity}" data-id="${item.id}" readonly>
-                <button class="quantity-btn increase-btn" data-id="${item.id}"><i class="fas fa-plus"></i></button>
-              </div>
-            </div>
-          </div>
-          <button class="delete-btn" data-id="${item.id}"><i class="fas fa-trash"></i></button>
-        `;
-
+  <div class="cart-img">
+    <img src="${item.imgLink}" alt="${item.name}">
+  </div>
+  <div class="cart-details">
+    <div class="cart-info">
+      <h3 class="product-name">${item.name}</h3>
+      <p class="product-description">${item.description}</p>
+      <p class="product-category">${item.category ? `<p class="product-category">${item.category.name.toUpperCase()}</p>` : ''}</p>
+    </div>
+    <div class="cart-price">
+      <p class="product-price">$${Number(item.price).toFixed(2)}</p>
+      <p class="product-stock">Stock disponible: ${item.stock}</p>
+      <div class="quantity-control">
+        <button class="quantity-btn decrease-btn" data-id="${item.id}"><i class="fas fa-minus"></i></button>
+        <span  class="quantity-input" data-id="${item.id}"> ${item.quantity}  </span>
+        <button class="quantity-btn increase-btn" data-id="${item.id}"><i class="fas fa-plus"></i></button>
+      </div>
+    </div>
+  </div>
+  <button class="delete-btn" data-id="${item.id}"><i class="fas fa-trash"></i></button>
+`;
         this.cartContainer.appendChild(card);
       });
 
@@ -258,94 +277,103 @@ class CartsPage {
 
     // Obtener nombre del usuario
     const userData = LocalStorageManager.getData("currentUser") || {};
-    const userName = userData.fullName || "Cliente";
-
+    const currentUser = AuthManager.getCurrentSession();
+    const userName = currentUser && currentUser.first_name && currentUser.last_name ? currentUser.full_name : "Cliente";
     this.cartSummary.innerHTML = `
-      <div class="invoice-header">
-        <h2 class="invoice-title">Resumen de Compra</h2>
-        <div class="invoice-details">
-          <p>Cliente: ${userName}</p>
-          <p>Factura #: ${this.generateInvoiceNumber()}</p>
-          <p>Fecha: ${this.getCurrentDateTime()}</p>
+  <div class="invoice-header">
+    <h2 class="invoice-title">Compra</h2>
+    <div class="invoice-details">
+      <p>Cliente: ${userName}</p>
+      <p>Factura #: ${this.invoiceNumber}</p>
+      <p>Fecha: ${this.getCurrentDateTime()}</p>
+    </div>
+  </div>
+  
+  <h3 style="margin-top: 0">Detalle de Factura</h3>
+  
+  <table class="invoice-table">
+    <thead>
+      <tr>
+        <th>Producto</th>
+        <th>Cant.</th>
+        <th>Precio</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${cart.map(item => `
+        <tr>
+          <td>${item.name}</td>
+          <td>${item.quantity}</td>
+          <td>$${Number(item.price).toFixed(2)}</td>
+          <td>$${(item.price * item.quantity).toFixed(2)}</td>
+        </tr>
+      `).join('')}
+    </tbody>
+  </table>
+  
+  <div class="total-section">
+    <div class="total-row">
+      <span class="total-label">Subtotal:</span>
+      <span class="total-value">$${subtotal.toFixed(2)}</span>
+    </div>
+    
+    <div class="total-row">
+      <span class="total-label">
+        IVA:
+        <div class="iva-control">
+          <input type="number" id="iva-rate" class="iva-input" value="${this.ivaRate}" min="0" max="100">%
         </div>
-      </div>
-      
-      <h3 style="margin-top: 0">Detalle de Factura</h3>
-      
-      <table class="invoice-table">
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Cant.</th>
-            <th>Precio</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${cart.map(item => `
-            <tr>
-              <td>${item.name}</td>
-              <td>${item.quantity}</td>
-              <td>$${Number(item.price).toFixed(2)}</td>
-              <td>$${(item.price * item.quantity).toFixed(2)}</td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-      
-      <div class="total-section">
-        <div class="total-row">
-          <span class="total-label">Subtotal:</span>
-          <span class="total-value">$${subtotal.toFixed(2)}</span>
-        </div>
-        
-        <div class="total-row">
-          <span class="total-label">
-            IVA:
-            <div class="iva-control">
-              <input type="number" id="iva-rate" class="iva-input" value="${this.ivaRate}" min="0" max="100">%
-            </div>
-          </span>
-          <span class="total-value">$${iva.toFixed(2)}</span>
-        </div>
-        
-        <div class="total-row grand-total">
-          <span class="total-label">Total:</span>
-          <span class="total-value">$${total.toFixed(2)}</span>
-        </div>
-      </div>
-      
-      <button id="btn-clear-cart" class="clear-cart-btn">
-        <i class="fas fa-trash-alt"></i> Vaciar carrito
-      </button>
-    `;
+      </span>
+      <span class="total-value">$${iva.toFixed(2)}</span>
+    </div>
+    
+    <div class="total-row grand-total">
+      <span class="total-label">Total:</span>
+      <span class="total-value">$${total.toFixed(2)}</span>
+    </div>
+  </div>
+  
+  <button id="btn-clear-cart" class="clear-cart-btn">
+    <i class="fas fa-trash-alt"></i> Vaciar carrito
+  </button>
+`;
   }
 
   attachEvents() {
     // Eventos para los botones de incrementar/decrementar cantidad
     this.cartContainer.querySelectorAll(".increase-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault(); // Prevenir comportamiento por defecto
         const productId = Number(btn.dataset.id);
         const quantityInput = this.cartContainer.querySelector(`.quantity-input[data-id="${productId}"]`);
-        const newQuantity = parseInt(quantityInput.value) + 1;
-        CartService.updateCart(productId, newQuantity);
-        this.renderCart();
+        if (quantityInput) {
+          const newQuantity = parseInt(quantityInput.value) + 1;
+          CartService.updateCart(productId, newQuantity);
+          this.renderCart();
+        }
       });
     });
 
     this.cartContainer.querySelectorAll(".decrease-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault(); // Prevenir comportamiento por defecto
         const productId = Number(btn.dataset.id);
         const quantityInput = this.cartContainer.querySelector(`.quantity-input[data-id="${productId}"]`);
-        const newQuantity = parseInt(quantityInput.value) - 1;
-        CartService.updateCart(productId, newQuantity);
-        this.renderCart();
+        if (quantityInput) {
+          const newQuantity = parseInt(quantityInput.value) - 1;
+          if (newQuantity >= 0) {
+            CartService.updateCart(productId, newQuantity);
+            this.renderCart();
+          }
+        }
       });
     });
 
     // Evento para eliminar producto
     this.cartContainer.querySelectorAll(".delete-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault(); // Prevenir comportamiento por defecto
         const productId = Number(btn.dataset.id);
         CartService.removeFromCart(productId);
         this.renderCart();
@@ -355,7 +383,8 @@ class CartsPage {
     // Evento para vaciar el carrito
     const clearBtn = document.getElementById("btn-clear-cart");
     if (clearBtn) {
-      clearBtn.addEventListener("click", () => {
+      clearBtn.addEventListener("click", (e) => {
+        e.preventDefault(); // Prevenir comportamiento por defecto
         CartService.clearCart();
         this.renderCart();
       });
@@ -372,4 +401,4 @@ class CartsPage {
   }
 }
 
-export { CartService, CartsPage };
+export {CartService, CartsPage};
