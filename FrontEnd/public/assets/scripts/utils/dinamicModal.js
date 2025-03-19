@@ -357,11 +357,11 @@ class DynamicModal {
           placeholder="0.00" title="Ingrese un precio válido mayor a 0" />
       </div>
 
-      <div class="form-group">
+   <!--   <div class="form-group">
         <label for="product-stock" class="form-label">Stock:</label>
         <input type="number" id="product-stock" name="stock" class="form-input" 
           value="${isEdit ? product.stock : ''}" required readonly />
-      </div>
+      </div>         -->
 
       <div class="form-group">
         <label for="product-category" class="form-label">Categoría:</label>

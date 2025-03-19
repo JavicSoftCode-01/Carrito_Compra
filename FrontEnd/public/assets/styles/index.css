@@ -43,9 +43,14 @@ body {
 /* Navegación                    */
 /* ============================= */
 .navigation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
     background-color: var(--bone-color);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 10px 20px;
+    z-index: 1000;
 }
 
 .nav-list {
@@ -113,10 +118,10 @@ body {
 /* ============================= */
 /* Panel de Administrador        */
 /* ============================= */
-.admin-section, .products-main {
+.admin-section, .products-main, .carts-main {
     padding: 10px;
     max-width: 95%;
-    margin: auto;
+    margin: 2.5% auto auto;
 }
 
 /*!* ============================= *!*/
@@ -150,6 +155,11 @@ body {
 
 /* En pantallas pequeñas, que cada gráfico ocupe el ancho completo */
 @media (max-width: 768px) {
+    .h1 {
+        padding-top: 3.5rem;
+        /*padding-bottom: 2rem;*/
+    }
+
     .chart-box {
         flex: 1 1 100%;
     }
@@ -215,6 +225,11 @@ body {
 
 /* ===== Responsividad ===== */
 @media (max-width: 768px) {
+    .h1 {
+        padding-top: 3.5rem;
+
+        /*padding-bottom: 2rem;*/
+    }
 
     /* Para los widgets: 2 por fila */
     .widgets-container {
@@ -239,12 +254,24 @@ body {
 
 /* En pantallas grandes: dos columnas; en móviles: una sola */
 @media (min-width: 769px) {
+    .h1 {
+        padding-top: 3.5rem;
+
+        /*padding-bottom: 2rem;*/
+    }
+
     .dynamic-form {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
 @media (max-width: 768px) {
+    .h1 {
+        padding-top: 3.5rem;
+
+        /*padding-bottom: 2rem;*/
+    }
+
     .dynamic-form {
         grid-template-columns: 1fr;
     }
@@ -415,6 +442,12 @@ body {
 
 /* Ajustar modal para pantallas pequeñas */
 @media (max-width: 768px) {
+    .h1 {
+        padding-top: 3.5rem;
+
+        /*padding-bottom: 2rem;*/
+    }
+
     .modal-content {
         margin: 15vh auto;
         padding: 20px;
@@ -453,6 +486,12 @@ body {
 
 /* Tabla responsive en móviles */
 @media (max-width: 768px) {
+    .h1 {
+        padding-top: 3.5rem;
+
+        /*padding-bottom: 2rem;*/
+    }
+
     .inventory-table thead {
         display: none;
     }
@@ -644,7 +683,6 @@ body {
 
 .h1 {
     padding-top: 1rem;
-
     padding-bottom: 2rem;
 }
 
@@ -654,6 +692,16 @@ body {
 .form-input:invalid:not(:placeholder-shown) {
     border-color: red;
 }
+
+/* ============================= */
+/* Carritos de compra tarjeta                        */
+/* ============================= */
+.cart-items {
+    padding: 20px;
+    background-color: #FDEBFD;
+    border-radius: 8px;
+}
+
 
 /* ============================= */
 /* Cards de los productos al cliente */
@@ -851,24 +899,47 @@ body {
 
 /* Responsive */
 @media (max-width: 1200px) {
+    .h1 {
+        padding-top: 3.5rem;
+
+        /*padding-bottom: 2rem;*/
+    }
+
     .product-card {
         width: calc(25% - 20px); /* 4 cards por fila */
     }
 }
 
 @media (max-width: 992px) {
+    .h1 {
+        padding-top: 3.5rem;
+
+        /*padding-bottom: 2rem;*/
+    }
+
     .product-card {
         width: calc(33.33% - 20px); /* 3 cards por fila */
     }
 }
 
 @media (max-width: 768px) {
+    .h1 {
+        padding-top: 3.5rem;
+
+        /*padding-bottom: 2rem;*/
+    }
+
     .product-card {
         width: calc(50% - 20px); /* 2 cards por fila */
     }
 }
 
 @media (max-width: 576px) {
+    .h1 {
+        padding-top: 3.5rem;
+        /*padding-bottom: 2rem;*/
+    }
+
     .product-card {
         width: 100%; /* 1 card por fila */
     }

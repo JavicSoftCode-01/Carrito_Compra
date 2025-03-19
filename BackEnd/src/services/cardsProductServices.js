@@ -1,4 +1,3 @@
-import {CartService} from "./cartsServices.js";
 import {ProductService} from "./productServices.js";
 import {NotificationManager} from "../../../FrontEnd/public/assets/scripts/utils/showNotifications.js";
 
@@ -22,6 +21,7 @@ class CardsProductService {
     this.cartItems = {};       // Cantidad seleccionada actualmente (por incrementos y decrementos)
     this.confirmedCart = {};   // Cantidad confirmada (ya agregada al carrito)
     this.productsContainer = document.getElementById('products-container');
+    this.CART_STORAGE_KEY = 'shopping_cart'; // Clave para localStorage del carrito
   }
 
   /**
@@ -29,6 +29,7 @@ class CardsProductService {
    */
   init() {
     this.loadProducts();
+    this.loadCartFromStorage(); // Cargar carrito guardado
     this.renderProducts();
     window.addEventListener('resize', () => this.adjustLayout());
   }
@@ -46,11 +47,73 @@ class CardsProductService {
   }
 
   /**
+   * Carga el carrito desde localStorage
+   */
+  loadCartFromStorage() {
+    const savedCart = localStorage.getItem(this.CART_STORAGE_KEY);
+    if (savedCart) {
+      this.confirmedCart = JSON.parse(savedCart);
+    }
+  }
+
+  /**
+   * Guarda el carrito en localStorage
+   */
+  saveCartToStorage() {
+    localStorage.setItem(this.CART_STORAGE_KEY, JSON.stringify(this.confirmedCart));
+  }
+
+  /**
    * Guarda los productos actualizados en el localStorage
    */
   updateLocalStorage() {
     localStorage.setItem(ProductService.STORAGE_KEY, JSON.stringify(this.products));
   }
+
+  /**
+   * Agrega la cantidad seleccionada al carrito (confirma la compra) y actualiza el stock en localStorage
+   * @param {string} productId - ID del producto
+   */
+  addToCart(productId) {
+    const product = this.products.find(p => p.id === productId);
+    if (!product) return;
+
+    const selectedQuantity = this.getCartQuantity(productId);
+
+    // Si no se ha seleccionado cantidad, se muestra "Agregar producto"
+    if (selectedQuantity === 0) {
+      NotificationManager.warning('Agregar producto');
+      return;
+    }
+
+    // Verificar que la cantidad seleccionada no exceda el stock disponible
+    if (selectedQuantity > product.stock) {
+      NotificationManager.warning(`Producto "${product.name}" con stock insuficiente, disponemos (${product.stock}) productos`);
+      return;
+    }
+
+    // Acumular la cantidad confirmada (si se han agregado previamente, se suma)
+    if (!this.confirmedCart[productId]) {
+      this.confirmedCart[productId] = 0;
+    }
+    this.confirmedCart[productId] += selectedQuantity;
+
+    // Reducir el stock del producto en base a la cantidad confirmada
+    product.stock -= selectedQuantity;
+
+    // Guardar en localStorage tanto el stock como el carrito
+    this.updateLocalStorage();
+    this.saveCartToStorage(); // Añadimos esta línea para guardar el carrito
+
+    // Reiniciar la cantidad seleccionada para ese producto
+    delete this.cartItems[productId];
+    this.updateProductCard(productId);
+
+    NotificationManager.success(`Producto "${product.name}" agregado (${selectedQuantity}) veces al carrito`);
+  }
+
+
+
 
   /**
    * Renderiza los productos en el contenedor
@@ -185,37 +248,49 @@ class CardsProductService {
   }
 
   /**
-   * Agrega la cantidad seleccionada al carrito y actualiza el stock
+   * Agrega la cantidad seleccionada al carrito (confirma la compra) y actualiza el stock en localStorage
    * @param {string} productId - ID del producto
    */
-  addToCart(productId) {
-    const product = this.products.find(p => p.id === productId);
-    if (!product) return;
-
-    const selectedQuantity = this.getCartQuantity(productId);
-
-    // Si no se ha seleccionado cantidad, se muestra "Agregar producto"
-    if (selectedQuantity === 0) {
-      NotificationManager.warning('Agregar producto');
-      return;
-    }
-
-    // Verificar que la cantidad seleccionada no exceda el stock disponible
-    if (selectedQuantity > product.stock) {
-      NotificationManager.warning(`Producto "${product.name}" con stock insuficiente, disponemos (${product.stock}) productos`);
-      return;
-    }
-
-    // Usar CartService para agregar al carrito
-    CartService.addToCart(product, selectedQuantity);
-
-    // Actualizar el stock local para reflejar cambios inmediatamente
-    this.loadProducts(); // Recargar productos con el nuevo stock
-
-    // Reiniciar la cantidad seleccionada para ese producto
-    delete this.cartItems[productId];
-    this.updateProductCard(productId);
-  }
+  // addToCart(productId) {
+  //   const product = this.products.find(p => p.id === productId);
+  //   if (!product) return;
+  //
+  //   const selectedQuantity = this.getCartQuantity(productId);
+  //
+  //   // Si no se ha seleccionado cantidad, se muestra "Agregar producto"
+  //   if (selectedQuantity === 0) {
+  //     NotificationManager.warning('Agregar producto');
+  //     return;
+  //   }
+  //
+  //   // Verificar que la cantidad seleccionada no exceda el stock disponible
+  //   if (selectedQuantity > product.stock) {
+  //     NotificationManager.warning(`Producto "${product.name}" con stock insuficiente, disponemos (${product.stock}) productos`);
+  //     return;
+  //   }
+  //
+  //   // Acumular la cantidad confirmada (si se han agregado previamente, se suma)
+  //   if (!this.confirmedCart[productId]) {
+  //     this.confirmedCart[productId] = 0;
+  //   }
+  //   this.confirmedCart[productId] += selectedQuantity;
+  //
+  //   // Reducir el stock del producto en base a la cantidad confirmada
+  //   product.stock -= selectedQuantity;
+  //
+  //   // Actualizar el localStorage para que el stock modificado persista
+  //   this.updateLocalStorage();
+  //
+  //
+  //
+  //   // Reiniciar la cantidad seleccionada para ese producto
+  //   delete this.cartItems[productId];
+  //   this.updateProductCard(productId);
+  //
+  //
+  //
+  //   NotificationManager.success(`Producto "${product.name}" agregado (${this.confirmedCart[productId]}) veces`);
+  // }
 
   /**
    * Actualiza la visualización de una card de producto

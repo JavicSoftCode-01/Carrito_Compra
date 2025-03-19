@@ -1,558 +1,852 @@
-import {LocalStorageManager} from "../database/localStorage.js";
+// import {ProductService} from "./productServices.js";
+// import {NotificationManager} from "../../../FrontEnd/public/assets/scripts/utils/showNotifications.js";
+// import {AuthManager} from "./authServices.js";
+// import {CategoryService} from "./categoryServices.js";
+//
+// /**
+//  * Clase para gestionar el carrito de compras
+//  */
+// class CartsPage {
+//   constructor() {
+//     // Elementos del DOM
+//     this.cartContainer = document.getElementById('cart-container');
+//     this.cartSummary = document.getElementById('cart-summary');
+//
+//     // Datos del carrito
+//     this.cartItems = {};
+//     this.products = [];
+//     this.ivaPercentage = 0; // IVA por defecto (12%)
+//
+//     // Datos de factura
+//     this.invoiceNumber = this.generateInvoiceNumber();
+//
+//     // Constantes
+//     this.CART_STORAGE_KEY = 'shopping_cart';
+//   }
+//
+//   /**
+//    * Inicializa la página del carrito
+//    */
+//   init() {
+//     this.loadCartFromStorage();
+//     this.loadProducts();
+//     this.renderCartItems();
+//     this.renderCartSummary();
+//
+//     // Eventos globales
+//     document.addEventListener('click', (e) => {
+//       if (e.target.closest('.clear-cart-btn')) {
+//         this.clearCart();
+//       }
+//     });
+//   }
+//
+//   /**
+//    * Genera un número de factura único
+//    */
+//   generateInvoiceNumber() {
+//     const date = new Date();
+//     const year = date.getFullYear().toString().substr(-2);
+//     const month = String(date.getMonth() + 1).padStart(2, '0');
+//     const day = String(date.getDate()).padStart(2, '0');
+//     const random = Math.floor(Math.random() * 1000).toString().padStart(4, '0');
+//     return `<strong>FAC-</strong>${year}${month}${day}-${random}`;
+//   }
+//
+//   /**
+//    * Carga los productos desde el servicio de productos
+//    */
+//   loadProducts() {
+//     try {
+//       this.products = ProductService.getAllProducts();
+//     } catch (error) {
+//       console.error("Error al cargar productos:", error);
+//       NotificationManager.error("Error al cargar productos");
+//     }
+//   }
+//
+//   /**
+//    * Carga el carrito desde localStorage
+//    */
+//   loadCartFromStorage() {
+//     const savedCart = localStorage.getItem(this.CART_STORAGE_KEY);
+//     if (savedCart) {
+//       this.cartItems = JSON.parse(savedCart);
+//     }
+//   }
+//
+//   /**
+//    * Guarda el carrito en localStorage
+//    */
+//   saveCartToStorage() {
+//     localStorage.setItem(this.CART_STORAGE_KEY, JSON.stringify(this.cartItems));
+//   }
+//
+//   /**
+//    * Renderiza los items del carrito
+//    */
+//   renderCartItems() {
+//     if (!this.cartContainer) return;
+//     this.cartContainer.innerHTML = '';
+//
+//     const cartItemIds = Object.keys(this.cartItems);
+//
+//     if (cartItemIds.length === 0) {
+//       this.cartContainer.innerHTML = `
+//         <div class="empty-cart">
+//           <i class="fa-solid fa-cart-shopping"></i>
+//           <p>Tu carrito está vacío</p>
+//           <p>Agrega productos desde la página de productos</p>
+//         </div>
+//       `;
+//       return;
+//     }
+//
+//     cartItemIds.forEach(productId => {
+//       const product = this.products.find(p => p.id === productId);
+//       if (product) {
+//         const cartItem = this.createCartItemCard(product, this.cartItems[productId]);
+//         this.cartContainer.appendChild(cartItem);
+//       }
+//     });
+//   }
+//
+//   /**
+//    * Crea una tarjeta para un item del carrito
+//    */
+//   createCartItemCard(product, quantity) {
+//     // Asegurarse de que la categoría esté cargada
+//     if (!product.category && product.categoryId) {
+//       product.category = CategoryService.getCategoryById(product.categoryId);
+//     }
+//
+//     const card = document.createElement('div');
+//     card.className = 'cart-card';
+//     card.dataset.productId = product.id;
+//
+//     card.innerHTML = `
+//     <!-- Botón de eliminar arriba a la derecha -->
+//     <button class="delete-btn" aria-label="Eliminar producto">
+//       <i class="fa-solid fa-trash fa-lg" style="color: red;"></i>
+//     </button>
+//     <!-- Imagen del producto a la izquierda -->
+//     <div class="cart-img">
+//       <img src="${product.imgLink || '/api/placeholder/300/200'}" alt="${product.name}">
+//     </div>
+//     <!-- Contenedor central con la info principal -->
+//     <div class="cart-content" style="margin-left: 5%">
+//       <h3 class="product-name">${product.name}</h3>
+//       <p class="product-description">${product.description || 'Sin descripción'}</p>
+//       <p class="product-category">${product.category ? product.category.name : 'Sin categoría'}</p>
+//     </div>
+//     <!-- Sección de precio/subtotal a la derecha -->
+//     <div class="cart-price" style="margin-right: 10%">
+//       <p class="product-price">$${product.pvp.toFixed(2)} / unidad</p>
+//       <p class="product-stock">Stock disponible: ${product.stock}</p>
+//       <!-- Control de cantidad -->
+//       <div class="quantity-control">
+//         <button class="quantity-btn btn-decrement">
+//           <i class="fa-solid fa-minus"></i>
+//         </button>
+//         <input type="text" class="quantity-input" value="${quantity}" readonly>
+//         <button class="quantity-btn btn-increment" ${product.stock <= 0 ? 'disabled' : ''}>
+//           <i class="fa-solid fa-plus"></i>
+//         </button>
+//       </div>
+//     </div>
+//   `;
+//
+//     // Event listeners
+//     const btnDecrement = card.querySelector('.btn-decrement');
+//     const btnIncrement = card.querySelector('.btn-increment');
+//     const deleteBtn = card.querySelector('.delete-btn');
+//
+//     btnDecrement.addEventListener('click', () => this.decrementQuantity(product.id));
+//     btnIncrement.addEventListener('click', () => this.incrementQuantity(product.id));
+//     deleteBtn.addEventListener('click', () => this.removeFromCart(product.id));
+//
+//     return card;
+//   }
+//
+//   /**
+//    * Renderiza el resumen del carrito y la factura
+//    */
+//   renderCartSummary() {
+//     if (!this.cartSummary) return;
+//
+//     const cartItemIds = Object.keys(this.cartItems);
+//
+//     if (cartItemIds.length === 0) {
+//       this.cartSummary.innerHTML = `
+//         <div class="invoice-header">
+//           <h2 class="invoice-title">Resumen de compra</h2>
+//           <p class="invoice-details">No hay productos en el carrito</p>
+//         </div>
+//       `;
+//       return;
+//     }
+//
+//     // Calcular totales
+//     let subtotal = 0;
+//     const items = [];
+//
+//     cartItemIds.forEach(productId => {
+//       const product = this.products.find(p => p.id === productId);
+//       if (product) {
+//         const quantity = this.cartItems[productId];
+//         const itemTotal = product.pvp * quantity;
+//         subtotal += itemTotal;
+//
+//         items.push({
+//           name: product.name,
+//           price: product.pvp,
+//           quantity: quantity,
+//           total: itemTotal
+//         });
+//       }
+//     });
+//
+//     const ivaAmount = subtotal * (this.ivaPercentage / 100);
+//     const total = subtotal + ivaAmount;
+//     const currentDate = new Date();
+//     const formattedDate = `${currentDate.getDate()} de ${this.getMonthName(currentDate.getMonth())} de ${currentDate.getFullYear()}`;
+//     const hours = currentDate.getHours();
+//     const ampm = hours >= 12 ? 'PM' : 'AM';
+//     const formattedHours = hours % 12 || 12;
+//     const formattedTime = `${formattedHours}:${String(currentDate.getMinutes()).padStart(2, '0')} ${ampm}`;
+//     const currentUser = AuthManager.getCurrentSession();
+//
+//     this.cartSummary.innerHTML = `
+//       <div class="invoice-header">
+//           <h2 class="invoice-title">Compra</h2>
+//           <div class="invoice-details">
+//             <div style="display: flex; justify-content: space-between; align-items: center;">
+//               <p><strong>Cliente:</strong> ${currentUser && currentUser.full_name ? currentUser.full_name : 'Cliente'}</p>
+//               <p> ${this.invoiceNumber}</p>
+//             </div>
+//             <p><strong>Fecha:</strong> ${formattedDate}</p>
+//             <p><strong>Hora:</strong> ${formattedTime}</p>
+//           </div>
+//         </div>
+//
+//       <h4 class="invoice-title" style="margin-top: -5%">Detalle de Compra</h4>
+//
+// <div class="invoice-table-container" style="max-height: 300px; overflow-y: auto; margin-top: -5%">
+//   <table class="invoice-table" style="width: 100%; border-collapse: collapse;">
+//     <thead style="position: sticky; top: 0; background-color: white; z-index: 0;">
+//       <tr>
+//         <th>Producto</th>
+//         <th>Cant.</th>
+//         <th>Precio</th>
+//         <th>Total</th>
+//       </tr>
+//     </thead>
+//     <tbody>
+//       ${items.map(item => `
+//         <tr>
+//           <td>${item.name}</td>
+//           <td style="text-align: center">${item.quantity}</td>
+//           <td style="text-align: center">$${item.price.toFixed(2)}</td>
+//           <td style="text-align: center">$${item.total.toFixed(2)}</td>
+//         </tr>
+//       `).join('')}
+//     </tbody>
+//   </table>
+// </div>
+//       <div class="total-section" style="margin-left: 0.2rem; margin-top: -3%">
+//         <div class="total-row">
+//           <span class="total-label">Subtotal:</span>
+//           <span class="total-value">$${subtotal.toFixed(2)}</span>
+//         </div>
+//
+//         <div class="iva-control total-row">
+//           <span class="total-label">IVA (%):</span>
+//           <input type="number" class="iva-input" value="${this.ivaPercentage}" min="0" max="100" id="iva-percentage" style="margin-left: -40%" readonly>
+//           <span class="total-value">$${ivaAmount.toFixed(2)}</span>
+//         </div>
+//
+//         <div class="total-row grand-total">
+//           <span class="total-label">Total:</span>
+//           <span class="total-value" style="color: #18b918; text-decoration: underline">$${total.toFixed(2)}</span>
+//         </div>
+//       </div>
+//
+//       <button class="clear-cart-btn" style="background-color: red">
+//         <i class="fa-solid fa-trash-can fa-lg" style="margin-right: 8px; color: white"></i> Vaciar carrito
+//       </button>
+//     `;
+//
+//     // Añadir event listener para el cambio de IVA
+//     const ivaInput = this.cartSummary.querySelector('#iva-percentage');
+//     if (ivaInput) {
+//       ivaInput.addEventListener('change', (e) => {
+//         this.ivaPercentage = parseFloat(e.target.value) || 0;
+//         this.renderCartSummary();
+//       });
+//     }
+//   }
+//
+//   /**
+//    * Obtiene el nombre del mes en español
+//    */
+//   getMonthName(monthIndex) {
+//     const months = [
+//       'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+//       'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+//     ];
+//     return months[monthIndex];
+//   }
+//
+//   /**
+//    * Incrementa la cantidad de un producto en el carrito
+//    */
+//   incrementQuantity(productId) {
+//     const product = this.products.find(p => p.id === productId);
+//     if (!product) return;
+//
+//     const currentQuantity = this.cartItems[productId] || 0;
+//
+//     // Verificar si hay stock suficiente
+//     if (product.stock <= 0) {
+//       NotificationManager.warning(`No hay suficiente stock de "${product.name}"`);
+//       return;
+//     }
+//
+//     this.cartItems[productId] = currentQuantity + 1;
+//     this.saveCartToStorage();
+//     this.updateProductStock(productId, -1); // Restar 1 al stock
+//     this.renderCartItems();
+//     this.renderCartSummary();
+//   }
+//
+//   /**
+//    * Decrementa la cantidad de un producto en el carrito
+//    */
+//   decrementQuantity(productId) {
+//     const currentQuantity = this.cartItems[productId] || 0;
+//
+//     if (currentQuantity <= 1) {
+//       // Si la cantidad es 1 o menos, eliminar el producto del carrito
+//       this.removeFromCart(productId);
+//       return;
+//     }
+//
+//     this.cartItems[productId] = currentQuantity - 1;
+//     this.saveCartToStorage();
+//     this.updateProductStock(productId, 1); // Sumar 1 al stock
+//     this.renderCartItems();
+//     this.renderCartSummary();
+//   }
+//
+//   /**
+//    * Elimina un producto del carrito
+//    */
+//   removeFromCart(productId) {
+//     const quantity = this.cartItems[productId] || 0;
+//
+//     if (quantity > 0) {
+//       // Devolver el stock
+//       this.updateProductStock(productId, quantity);
+//
+//       // Eliminar del carrito
+//       delete this.cartItems[productId];
+//       this.saveCartToStorage();
+//
+//       // Notificar al usuario
+//       const product = this.products.find(p => p.id === productId);
+//       if (product) {
+//         NotificationManager.info(`Producto "${product.name}" eliminado del carrito`);
+//       }
+//
+//       // Actualizar la interfaz
+//       this.renderCartItems();
+//       this.renderCartSummary();
+//     }
+//   }
+//
+//   /**
+//    * Vacía todo el carrito y devuelve el stock
+//    */
+//   clearCart() {
+//     // Confirmar antes de vaciar
+//     if (!confirm('¿Estás seguro de que deseas vaciar el carrito?')) {
+//       return;
+//     }
+//
+//     // Devolver el stock de cada producto
+//     Object.keys(this.cartItems).forEach(productId => {
+//       const quantity = this.cartItems[productId];
+//       this.updateProductStock(productId, quantity);
+//     });
+//
+//     // Vaciar el carrito
+//     this.cartItems = {};
+//     this.saveCartToStorage();
+//
+//     // Notificar al usuario
+//     NotificationManager.info('Carrito vaciado correctamente');
+//
+//     // Actualizar la interfaz
+//     this.renderCartItems();
+//     this.renderCartSummary();
+//   }
+//
+//   /**
+//    * Actualiza el stock de un producto y guarda en localStorage
+//    */
+//   updateProductStock(productId, quantityToAdd) {
+//     const product = this.products.find(p => p.id === productId);
+//     if (!product) return;
+//
+//     // Actualizar el stock
+//     product.stock += quantityToAdd;
+//
+//     // Guardar en localStorage
+//     localStorage.setItem(ProductService.STORAGE_KEY, JSON.stringify(this.products));
+//   }
+// }
+//
+// export {CartsPage};
+
+import {ProductService} from "./productServices.js";
 import {NotificationManager} from "../../../FrontEnd/public/assets/scripts/utils/showNotifications.js";
-import {ExecuteManager} from "../utils/execute.js";
 import {AuthManager} from "./authServices.js";
+import {CategoryService} from "./categoryServices.js";
 
-const CART_KEY = "cart";
-const PRODUCTS_KEY = "products";
-
+/**
+ * Clase para gestionar el carrito de compras
+ */
 class CartsPage {
   constructor() {
-    this.cartContainer = document.getElementById("cart-container");
-    this.cartSummary = document.getElementById("cart-summary");
-    this.ivaRate = 12; // Valor predeterminado de IVA
+    // Elementos del DOM
+    this.cartContainer = document.getElementById('cart-container');
+    this.cartSummary = document.getElementById('cart-summary');
+
+    // Datos del carrito
+    this.cartItems = {};
+    this.products = [];
+    this.ivaPercentage = 0; // IVA por defecto (12%)
+
+    // Datos de factura
     this.invoiceNumber = this.generateInvoiceNumber();
-    this.removeTimers = {}; // Para manejar los temporizadores de eliminación
 
-    // Se adjunta la delegación de eventos una sola vez
-    this.attachDelegationEvents();
+    // Constantes
+    this.CART_STORAGE_KEY = 'shopping_cart';
   }
 
+  /**
+   * Inicializa la página del carrito
+   */
   init() {
-    return ExecuteManager.execute(() => {
-      CartService.refreshCartStockInfo();
-      this.renderCart();
-    }, "Carrito de compras inicializado", "Error al inicializar el carrito de compras");
+    this.loadCartFromStorage();
+    this.loadProducts();
+    this.renderCartItems();
+    this.renderCartSummary();
+
+    // Eventos globales
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('.clear-cart-btn')) {
+        this.clearCart();
+      }
+    });
+
+    // Añadir evento de redimensionado para ajustar el layout
+    window.addEventListener('resize', () => {
+      this.adjustLayoutForScreenSize();
+    });
+
+    // Ajustar layout inicial
+    this.adjustLayoutForScreenSize();
   }
 
+  /**
+   * Ajusta el layout basado en el tamaño de la pantalla
+   */
+  adjustLayoutForScreenSize() {
+    const cartLayout = document.querySelector('.cart-layout');
+    const isMobile = window.innerWidth <= 768;
+
+    if (cartLayout) {
+      cartLayout.style.flexDirection = isMobile ? 'column' : 'row';
+    }
+
+    if (this.cartSummary) {
+      this.cartSummary.style.position = isMobile ? 'static' : 'sticky';
+    }
+  }
+
+  /**
+   * Genera un número de factura único
+   */
   generateInvoiceNumber() {
-    return Math.floor(10000000 + Math.random() * 90000000).toString();
+    const date = new Date();
+    const year = date.getFullYear().toString().substr(-2);
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const random = Math.floor(Math.random() * 1000).toString().padStart(4, '0');
+    return `<strong>FAC-</strong>${year}${month}${day}-${random}`;
   }
 
-  getCurrentDateTime() {
-    const now = new Date();
-    const options = {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    };
-    return now.toLocaleDateString('es-ES', options);
-  }
-
-  renderCart() {
-    return ExecuteManager.execute(() => {
-      const cart = CartService.getCart();
-      // Actualizamos la información de stock de cada item
-      CartService.refreshCartStockInfo();
-
-      this.cartContainer.innerHTML = "";
-
-      if (cart.length === 0) {
-        this.cartContainer.innerHTML = `
-          <div class="empty-cart">
-            <i class="fas fa-shopping-basket fa-lg"></i>
-            <p>Tu carrito está vacío</p>
-            <p>¡Agrega algunos productos increíbles!</p>
-          </div>
-        `;
-        this.cartSummary.innerHTML = "";
-        return;
-      }
-
-      cart.forEach(item => {
-        const card = document.createElement("div");
-        card.className = "cart-card";
-        card.dataset.id = item.id; // Aseguramos que el id se asigne correctamente
-
-        if (item.quantity <= 0) {
-          card.classList.add('removing');
-        }
-
-        card.innerHTML = `
-          <div class="cart-img">
-            <img src="${item.imgLink}" alt="${item.name}">
-          </div>
-          <div class="cart-details">
-            <div class="cart-info">
-              <h3 class="product-name">${item.name}</h3>
-              <p class="product-description">${item.description || 'Sin descripción'}</p>
-              <p class="product-category">${item.category && item.category.name ? item.category.name.toUpperCase() : ''}</p>
-            </div>
-            <div class="cart-price">
-              <p class="product-price">$${Number(item.price).toFixed(2)}</p>
-              <p class="product-stock">Stock disponible: ${item.stock}</p>
-              <div class="quantity-control">
-                <button class="quantity-btn decrease-btn" data-id="${item.id}"><i class="fas fa-minus"></i></button>
-                <span class="quantity-display">${item.quantity}</span>
-                <button class="quantity-btn increase-btn" data-id="${item.id}"><i class="fas fa-plus"></i></button>
-              </div>
-              ${item.quantity <= 0 ? '<p class="removal-notice">Se eliminará en <span class="countdown">5</span> segundos</p>' : ''}
-            </div>
-          </div>
-          <a class="btn delete-btn" data-id="${item.id}"><i class="fas fa-trash fa-lg"></i></a>
-        `;
-
-        this.cartContainer.appendChild(card);
-
-        if (item.quantity <= 0 && !this.removeTimers[item.id]) {
-          this.startRemovalCountdown(item.id);
-        }
-      });
-
-      // Renderizamos el resumen/factura
-      this.renderInvoiceSummary(cart);
-      // No se requiere volver a adjuntar eventos, ya que se usa delegación
-    }, "Carrito renderizado", "Error al renderizar el carrito");
-  }
-
-  startRemovalCountdown(productId) {
-    // Si ya existe un temporizador para este producto, lo cancelamos
-    if (this.removeTimers[productId]) {
-      clearInterval(this.removeTimers[productId].interval);
-      clearTimeout(this.removeTimers[productId].timeout);
-    }
-
-    let secondsLeft = 5;
-    const countdownElement = this.cartContainer.querySelector(`.cart-card[data-id="${productId}"] .countdown`);
-    if (!countdownElement) return;
-
-    const intervalId = setInterval(() => {
-      secondsLeft--;
-      if (countdownElement) {
-        countdownElement.textContent = secondsLeft;
-      }
-    }, 1000);
-
-    const timeoutId = setTimeout(() => {
-      CartService.removeFromCart(productId);
-      this.renderCart();
-      delete this.removeTimers[productId];
-      NotificationManager.info(`Producto eliminado automáticamente por cantidad cero.`);
-    }, 5000);
-
-    this.removeTimers[productId] = {
-      interval: intervalId,
-      timeout: timeoutId
-    };
-  }
-
-  cancelRemovalCountdown(productId) {
-    if (this.removeTimers[productId]) {
-      clearInterval(this.removeTimers[productId].interval);
-      clearTimeout(this.removeTimers[productId].timeout);
-      delete this.removeTimers[productId];
+  /**
+   * Carga los productos desde el servicio de productos
+   */
+  loadProducts() {
+    try {
+      this.products = ProductService.getAllProducts();
+    } catch (error) {
+      console.error("Error al cargar productos:", error);
+      NotificationManager.error("Error al cargar productos");
     }
   }
 
-  renderInvoiceSummary(cart) {
-    const subtotal = CartService.getCartTotal();
-    const iva = (subtotal * this.ivaRate) / 100;
-    const total = subtotal + iva;
+  /**
+   * Carga el carrito desde localStorage
+   */
+  loadCartFromStorage() {
+    const savedCart = localStorage.getItem(this.CART_STORAGE_KEY);
+    if (savedCart) {
+      this.cartItems = JSON.parse(savedCart);
+    }
+  }
+
+  /**
+   * Guarda el carrito en localStorage
+   */
+  saveCartToStorage() {
+    localStorage.setItem(this.CART_STORAGE_KEY, JSON.stringify(this.cartItems));
+  }
+
+  /**
+   * Renderiza los items del carrito
+   */
+  renderCartItems() {
+    if (!this.cartContainer) return;
+    this.cartContainer.innerHTML = '';
+
+    const cartItemIds = Object.keys(this.cartItems);
+
+    if (cartItemIds.length === 0) {
+      this.cartContainer.innerHTML = `
+        <div class="empty-cart">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <p>Tu carrito está vacío</p>
+          <p>Agrega productos desde la página de productos</p>
+        </div>
+      `;
+      return;
+    }
+
+    cartItemIds.forEach(productId => {
+      const product = this.products.find(p => p.id === productId);
+      if (product) {
+        const cartItem = this.createCartItemCard(product, this.cartItems[productId]);
+        this.cartContainer.appendChild(cartItem);
+      }
+    });
+  }
+
+  /**
+   * Crea una tarjeta para un item del carrito
+   */
+  createCartItemCard(product, quantity) {
+    // Asegurarse de que la categoría esté cargada
+    if (!product.category && product.categoryId) {
+      product.category = CategoryService.getCategoryById(product.categoryId);
+    }
+
+    const card = document.createElement('div');
+    card.className = 'cart-card';
+    card.dataset.productId = product.id;
+
+    card.innerHTML = `
+    <div class="cart-card-inner">
+      <!-- Botón de eliminar arriba a la derecha -->
+      <button class="delete-btn" aria-label="Eliminar producto">
+        <i class="fa-solid fa-trash fa-lg" style="color: red;"></i>
+      </button>
+      
+      <!-- Imagen del producto -->
+      <div class="cart-img">
+        <img src="${product.imgLink || '/api/placeholder/300/200'}" alt="${product.name}">
+      </div>
+      
+      <!-- Contenedor con la info principal -->
+      <div class="cart-content">
+        <h3 class="product-name">${product.name}</h3>
+        <p class="product-description">${product.description || 'Sin descripción'}</p>
+        <p class="product-category">${product.category ? product.category.name : 'Sin categoría'}</p>
+      </div>
+      
+      <!-- Sección de precio -->
+      <div class="cart-price">
+        <p class="product-price">$${product.pvp.toFixed(2)}</p>
+        <p class="product-stock">Stock disponible: ${product.stock}</p>
+        <!-- Control de cantidad -->
+        <div class="quantity-control">
+          <button class="quantity-btn btn-decrement">
+            <i class="fa-solid fa-minus"></i>
+          </button>
+          <input type="text" class="quantity-input" value="${quantity}" readonly>
+          <button class="quantity-btn btn-increment" ${product.stock <= 0 ? 'disabled' : ''}>
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+    // Event listeners
+    const btnDecrement = card.querySelector('.btn-decrement');
+    const btnIncrement = card.querySelector('.btn-increment');
+    const deleteBtn = card.querySelector('.delete-btn');
+
+    btnDecrement.addEventListener('click', () => this.decrementQuantity(product.id));
+    btnIncrement.addEventListener('click', () => this.incrementQuantity(product.id));
+    deleteBtn.addEventListener('click', () => this.removeFromCart(product.id));
+
+    return card;
+  }
+
+  /**
+   * Renderiza el resumen del carrito y la factura
+   */
+  renderCartSummary() {
+    if (!this.cartSummary) return;
+
+    const cartItemIds = Object.keys(this.cartItems);
+
+    if (cartItemIds.length === 0) {
+      this.cartSummary.innerHTML = `
+        <div class="invoice-header">
+          <h2 class="invoice-title">Resumen de compra</h2>
+          <p class="invoice-details">No hay productos en el carrito</p>
+        </div>
+      `;
+      return;
+    }
+
+    // Calcular totales
+    let subtotal = 0;
+    const items = [];
+
+    cartItemIds.forEach(productId => {
+      const product = this.products.find(p => p.id === productId);
+      if (product) {
+        const quantity = this.cartItems[productId];
+        const itemTotal = product.pvp * quantity;
+        subtotal += itemTotal;
+
+        items.push({
+          name: product.name,
+          price: product.pvp,
+          quantity: quantity,
+          total: itemTotal
+        });
+      }
+    });
+
+    const ivaAmount = subtotal * (this.ivaPercentage / 100);
+    const total = subtotal + ivaAmount;
+    const currentDate = new Date();
+    const formattedDate = `${currentDate.getDate()} de ${this.getMonthName(currentDate.getMonth())} de ${currentDate.getFullYear()}`;
+    const hours = currentDate.getHours();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const formattedHours = hours % 12 || 12;
+    const formattedTime = `${formattedHours}:${String(currentDate.getMinutes()).padStart(2, '0')} ${ampm}`;
     const currentUser = AuthManager.getCurrentSession();
-    const userName = currentUser && currentUser.first_name && currentUser.last_name
-      ? currentUser.full_name
-      : "Cliente";
 
     this.cartSummary.innerHTML = `
       <div class="invoice-header">
         <h2 class="invoice-title">Compra</h2>
         <div class="invoice-details">
-          <p>Cliente: ${userName}</p>
-          <p>Factura #: ${this.invoiceNumber}</p>
-          <p>Fecha: ${this.getCurrentDateTime()}</p>
+          <div class="invoice-client-info">
+            <p><strong>Cliente:</strong> ${currentUser && currentUser.full_name ? currentUser.full_name : 'Cliente'}</p>
+            <p class="invoice-number">${this.invoiceNumber}</p>
+          </div>
+          <p><strong>Fecha:</strong> ${formattedDate}</p>
+          <p><strong>Hora:</strong> ${formattedTime}</p>
         </div>
       </div>
-      
-      <h3 style="margin-top: 0">Detalle de Factura</h3>
-      
-      <table class="invoice-table">
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Cant.</th>
-            <th>Precio</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${cart.map(item => `
+
+      <h4 class="invoice-subtitle">Detalle de Compra</h4>
+
+      <div class="invoice-table-container">
+        <table class="invoice-table">
+          <thead>
             <tr>
-              <td>${item.name}</td>
-              <td>${item.quantity}</td>
-              <td>$${Number(item.price).toFixed(2)}</td>
-              <td>$${(item.price * item.quantity).toFixed(2)}</td>
+              <th>Producto</th>
+              <th>Cant.</th>
+              <th>Precio</th>
+              <th>Total</th>
             </tr>
-          `).join('')}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            ${items.map(item => `
+              <tr>
+                <td class="item-name">${item.name}</td>
+                <td class="item-quantity">${item.quantity}</td>
+                <td class="item-price">$${item.price.toFixed(2)}</td>
+                <td class="item-total">$${item.total.toFixed(2)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
       
       <div class="total-section">
         <div class="total-row">
           <span class="total-label">Subtotal:</span>
           <span class="total-value">$${subtotal.toFixed(2)}</span>
         </div>
-        
-        <div class="total-row">
-          <span class="total-label">
-            IVA:
-            <div class="iva-control">
-              <input type="number" id="iva-rate" class="iva-input" value="${this.ivaRate}" min="0" max="100" step="0.1">%
-            </div>
-          </span>
-          <span class="total-value">$${iva.toFixed(2)}</span>
+
+        <div class="iva-control total-row">
+          <span class="total-label">IVA (%):</span>
+          <input type="number" class="iva-input" value="${this.ivaPercentage}" min="0" max="100" id="iva-percentage" readonly>
+          <span class="total-value">$${ivaAmount.toFixed(2)}</span>
         </div>
-        
+
         <div class="total-row grand-total">
           <span class="total-label">Total:</span>
-          <span class="total-value">$${total.toFixed(2)}</span>
+          <span class="total-value total-highlight">$${total.toFixed(2)}</span>
         </div>
       </div>
-      
-      <button id="btn-clear-cart" class="clear-cart-btn">
-        <i class="fas fa-trash-alt fa-lg"></i> Vaciar carrito
+
+      <button class="clear-cart-btn">
+        <i class="fa-solid fa-trash-can fa-lg"></i> Vaciar carrito
       </button>
     `;
-    this.attachIvaEvent();
-  }
 
-  attachIvaEvent() {
-    const ivaInput = document.getElementById("iva-rate");
+    // Añadir event listener para el cambio de IVA
+    const ivaInput = this.cartSummary.querySelector('#iva-percentage');
     if (ivaInput) {
-      ivaInput.addEventListener("input", (e) => {
-        let value = e.target.value.trim();
-        if (value === "") return;
-        value = parseFloat(value);
-        if (isNaN(value)) {
-          e.target.value = this.ivaRate;
-          NotificationManager.warning("Por favor ingrese un valor numérico válido");
-          return;
-        }
-        if (value < 0) {
-          e.target.value = this.ivaRate;
-          this.ivaRate = 0;
-          NotificationManager.warning("El IVA no puede ser negativo");
-        } else if (value > 100) {
-          e.target.value = this.ivaRate;
-          this.ivaRate = 100;
-          NotificationManager.warning("El IVA no puede ser mayor a 100%");
-        } else {
-          this.ivaRate = value;
-        }
-        const subtotal = CartService.getCartTotal();
-        const iva = (subtotal * this.ivaRate) / 100;
-        const total = subtotal + iva;
-        const ivaValueElement = ivaInput.closest('.total-row').querySelector('.total-value');
-        if (ivaValueElement) {
-          ivaValueElement.textContent = `$${iva.toFixed(2)}`;
-        }
-        const totalValueElement = document.querySelector('.grand-total .total-value');
-        if (totalValueElement) {
-          totalValueElement.textContent = `$${total.toFixed(2)}`;
-        }
-      });
-
-      ivaInput.addEventListener("blur", (e) => {
-        let value = e.target.value.trim();
-        if (value === "" || isNaN(parseFloat(value))) {
-          e.target.value = 12;
-          this.ivaRate = 12;
-          NotificationManager.info("Valor de IVA restaurado al 12%");
-          const subtotal = CartService.getCartTotal();
-          const iva = (subtotal * this.ivaRate) / 100;
-          const total = subtotal + iva;
-          const ivaValueElement = ivaInput.closest('.total-row').querySelector('.total-value');
-          if (ivaValueElement) {
-            ivaValueElement.textContent = `$${iva.toFixed(2)}`;
-          }
-          const totalValueElement = document.querySelector('.grand-total .total-value');
-          if (totalValueElement) {
-            totalValueElement.textContent = `$${total.toFixed(2)}`;
-          }
-        }
+      ivaInput.addEventListener('change', (e) => {
+        this.ivaPercentage = parseFloat(e.target.value) || 0;
+        this.renderCartSummary();
       });
     }
+
+    // Ajustar el layout según el tamaño de la pantalla
+    this.adjustLayoutForScreenSize();
   }
 
-  attachDelegationEvents() {
-    // Adjuntamos la delegación de eventos en el contenedor del carrito
-    this.cartContainer.addEventListener("click", this.handleCartClick.bind(this));
-
+  /**
+   * Obtiene el nombre del mes en español
+   */
+  getMonthName(monthIndex) {
+    const months = [
+      'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+      'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+    ];
+    return months[monthIndex];
   }
 
-  deleteProduct(productId) {
-    return ExecuteManager.execute(() => {
-      // Obtener el carrito y la lista de productos desde localStorage
-      let cart = LocalStorageManager.getData("cart") || [];
-      let products = LocalStorageManager.getData("products") || [];
+  /**
+   * Incrementa la cantidad de un producto en el carrito
+   */
+  incrementQuantity(productId) {
+    const product = this.products.find(p => p.id === productId);
+    if (!product) return;
 
-      // Buscar el producto en el carrito según su id
-      const productIndex = cart.findIndex(item => item.id === productId);
-      if (productIndex === -1) {
-        NotificationManager.warning("El producto no existe en el carrito");
-        return;
-      }
+    const currentQuantity = this.cartItems[productId] || 0;
 
-      // Guardar el producto a eliminar para poder acceder a su nombre y cantidad
-      const deletedProduct = cart[productIndex];
-
-      // Eliminar el producto del carrito
-      cart.splice(productIndex, 1);
-
-      // Buscar el producto en la lista de productos y devolver el stock
-      const productInStock = products.find(p => p.id === productId);
-      if (productInStock) {
-        productInStock.stock += deletedProduct.quantity;
-      }
-
-      // Guardar los cambios en localStorage
-      LocalStorageManager.setData("cart", cart);
-      LocalStorageManager.setData("products", products);
-
-      NotificationManager.success(`Se eliminó ${deletedProduct.name} del carrito y se devolvieron ${deletedProduct.quantity} unidades al stock.`);
-      this.renderCart();
-    }, "Producto eliminado correctamente", "Error al eliminar el producto");
-  }
-
-
-  handleCartClick(e) {
-    // Botón para incrementar cantidad
-    const increaseBtn = e.target.closest(".increase-btn");
-    if (increaseBtn) {
-      e.preventDefault();
-      const productId = Number(increaseBtn.dataset.id);
-      this.cancelRemovalCountdown(productId);
-      const card = this.cartContainer.querySelector(`.cart-card[data-id="${productId}"]`);
-      if (card) {
-        const quantityDisplay = card.querySelector(".quantity-display");
-        const currentQuantity = parseInt(quantityDisplay.textContent);
-        const newQuantity = currentQuantity + 1;
-        CartService.updateCart(productId, newQuantity);
-        this.renderCart();
-      }
+    // Verificar si hay stock suficiente
+    if (product.stock <= 0) {
+      NotificationManager.warning(`No hay suficiente stock de "${product.name}"`);
       return;
     }
 
-    // Botón para disminuir cantidad
-    const decreaseBtn = e.target.closest(".decrease-btn");
-    if (decreaseBtn) {
-      e.preventDefault();
-      const productId = Number(decreaseBtn.dataset.id);
-      const card = this.cartContainer.querySelector(`.cart-card[data-id="${productId}"]`);
-      if (card) {
-        const quantityDisplay = card.querySelector(".quantity-display");
-        const currentQuantity = parseInt(quantityDisplay.textContent);
-        const newQuantity = currentQuantity - 1;
-        // Si llega a cero se actualiza y se inicia la cuenta regresiva
-        CartService.updateCart(productId, newQuantity <= 0 ? 0 : newQuantity);
-        this.renderCart();
-      }
+    this.cartItems[productId] = currentQuantity + 1;
+    this.saveCartToStorage();
+    this.updateProductStock(productId, -1); // Restar 1 al stock
+    this.renderCartItems();
+    this.renderCartSummary();
+  }
+
+  /**
+   * Decrementa la cantidad de un producto en el carrito
+   */
+  decrementQuantity(productId) {
+    const currentQuantity = this.cartItems[productId] || 0;
+
+    if (currentQuantity <= 1) {
+      // Si la cantidad es 1 o menos, eliminar el producto del carrito
+      this.removeFromCart(productId);
       return;
     }
 
-    this.cartContainer.addEventListener("click", (e) => {
-      const deleteBtn = e.target.closest(".delete-btn");
-      if (deleteBtn) {
-        e.preventDefault();
-        const productId = deleteBtn.dataset.id; // En este caso productId es una cadena
-        this.deleteProduct(productId);
-      }
-    });
-
-
-    // Evento para vaciar el carrito ()
-    const clearBtn = document.getElementById("btn-clear-cart");
-    if (clearBtn) {
-      clearBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        CartService.clearCart();
-        this.renderCart();
-      });
-    }
-  }
-}
-
-
-class CartService {
-  // Obtiene el carrito actual desde localStorage
-  static getCart() {
-    return LocalStorageManager.getData(CART_KEY) || [];
+    this.cartItems[productId] = currentQuantity - 1;
+    this.saveCartToStorage();
+    this.updateProductStock(productId, 1); // Sumar 1 al stock
+    this.renderCartItems();
+    this.renderCartSummary();
   }
 
-  // Guarda el carrito actualizado
-  static saveCart(cart) {
-    LocalStorageManager.setData(CART_KEY, cart);
-  }
+  /**
+   * Elimina un producto del carrito
+   */
+  removeFromCart(productId) {
+    const quantity = this.cartItems[productId] || 0;
 
-  // Actualiza el stock de un producto en el almacenamiento principal
-  static updateProductStock(productId, stockChange) {
-    const products = LocalStorageManager.getData(PRODUCTS_KEY) || [];
-    const productIndex = products.findIndex(p => p.id === productId);
-    if (productIndex !== -1) {
-      products[productIndex].stock += stockChange;
-      if (products[productIndex].stock < 0) {
-        products[productIndex].stock = 0;
-      }
-      LocalStorageManager.setData(PRODUCTS_KEY, products);
-      return true;
-    }
-    return false;
-  }
+    if (quantity > 0) {
+      // Devolver el stock
+      this.updateProductStock(productId, quantity);
 
-  // Verifica el stock disponible para un producto
-  static checkAvailableStock(productId) {
-    const products = LocalStorageManager.getData(PRODUCTS_KEY) || [];
-    const product = products.find(p => p.id === productId);
-    return product ? product.stock : 0;
-  }
+      // Eliminar del carrito
+      delete this.cartItems[productId];
+      this.saveCartToStorage();
 
-  // Agrega un producto al carrito (si ya existe, incrementa la cantidad)
-  static addToCart(product, quantity = 1) {
-    return ExecuteManager.execute(() => {
-      const currentStock = CartService.checkAvailableStock(product.id);
-      if (quantity > currentStock) {
-        NotificationManager.warning("No hay suficiente stock disponible.");
-        return;
-      }
-      let cart = CartService.getCart();
-      const existingIndex = cart.findIndex(item => item.id === product.id);
-      if (existingIndex !== -1) {
-        const newQuantity = cart[existingIndex].quantity + quantity;
-        if (newQuantity > currentStock) {
-          NotificationManager.warning("No hay suficiente stock para agregar más.");
-          return;
-        }
-        cart[existingIndex].quantity = newQuantity;
-      } else {
-        cart.push({
-          id: product.id,
-          name: product.name,
-          price: product.price,
-          stock: currentStock - quantity, // Update stock correctly
-          quantity: quantity,
-          description: product.description,
-          imgLink: product.imgLink,
-          category: product.category || "General"
-        });
-      }
-      // Actualiza el stock en el almacenamiento principal
-      CartService.updateProductStock(product.id, -quantity);
-      CartService.saveCart(cart);
-      NotificationManager.success("Producto agregado al carrito.");
-    }, "Producto agregado al carrito", "Error al agregar producto al carrito");
-  }
-
-  static updateCart(productId, newQuantity) {
-    return ExecuteManager.execute(() => {
-      let cart = CartService.getCart();
-      const index = cart.findIndex(item => item.id === productId);
-      if (index !== -1) {
-        const currentQuantity = cart[index].quantity;
-        const quantityChange = newQuantity - currentQuantity;
-
-        if (newQuantity < 0) {
-          newQuantity = 0; // No permitir cantidades negativas
-        }
-
-        if (quantityChange > 0) {
-          const availableStock = CartService.checkAvailableStock(productId);
-          if (quantityChange > availableStock) {
-            NotificationManager.warning("No hay suficiente stock disponible.");
-            return;
-          }
-        }
-
-        // Actualiza el stock en el almacenamiento principal
-        CartService.updateProductStock(productId, -quantityChange);
-        cart[index].quantity = newQuantity;
-
-        // Actualizar el stock en el item del carrito para mostrar el valor correcto
-        cart[index].stock = CartService.checkAvailableStock(productId);
-
-        CartService.saveCart(cart);
-
-        if (newQuantity === 0) {
-          NotificationManager.warning(`El producto se eliminará en 5 segundos si la cantidad es cero.`);
-        } else {
-          NotificationManager.success("Cantidad actualizada.");
-        }
-      }
-    }, "Cantidad actualizada", "Error al actualizar cantidad en el carrito");
-  }
-
-  // Elimina un producto del carrito y devuelve la cantidad al stock
-  static removeFromCart(productId) {
-    return ExecuteManager.execute(() => {
-      let cart = CartService.getCart();
-      const index = cart.findIndex(item => item.id === productId);
-      if (index !== -1) {
-        const quantityToReturn = cart[index].quantity;
-        CartService.updateProductStock(productId, quantityToReturn);
-        cart.splice(index, 1);
-        CartService.saveCart(cart);
-        NotificationManager.success("Producto eliminado del carrito.");
-      }
-    }, "Producto eliminado del carrito", "Error al eliminar producto del carrito");
-  }
-
-  // Vacía el carrito y devuelve todos los productos al stock
-  static clearCart() {
-    return ExecuteManager.execute(() => {
-      const cart = CartService.getCart();
-      cart.forEach(item => {
-        CartService.updateProductStock(item.id, item.quantity);
-      });
-      CartService.saveCart([]);
-      NotificationManager.success("Carrito vaciado.");
-    }, "Carrito vaciado", "Error al vaciar el carrito");
-  }
-
-  // Calcula el total de la compra
-  static getCartTotal() {
-    const cart = CartService.getCart();
-    return cart.reduce((total, item) => total + item.price * item.quantity, 0);
-  }
-
-  // Refresca la información de stock de cada item en el carrito según los datos actuales
-  static refreshCartStockInfo() {
-    let cart = CartService.getCart();
-    const products = LocalStorageManager.getData(PRODUCTS_KEY) || [];
-
-    let updated = false;
-    cart = cart.map(item => {
-      const product = products.find(p => p.id === item.id);
+      // Notificar al usuario
+      const product = this.products.find(p => p.id === productId);
       if (product) {
-        // The stock shown in cart should be the AVAILABLE stock (after subtracting what's in cart)
-        item.stock = product.stock;
-
-        // Asegurarse de que el producto tenga categoría
-        if (!item.category && product.category) {
-          item.category = product.category;
-        }
-
-        // Verificar si la cantidad en carrito es mayor que el stock disponible
-        // if (item.quantity > product.stock) {
-        //   // Adjust quantity if more than available
-        //   item.quantity = product.stock > 0 ? product.stock : 0;
-        //   updated = true;
-        //   NotificationManager.warning(`Cantidad de "${item.name}" ajustada al stock disponible.`);
-        // }
-        if (product) {
-          item.stock = product.stock;
-          // NotificationManager.warning(`Cantidad de "${item.name}" ajustada al stock disponible.`);
-
-        }
+        NotificationManager.info(`Producto "${product.name}" eliminado del carrito`);
       }
-      return item;
-    });
 
-    if (updated) {
-      CartService.saveCart(cart);
+      // Actualizar la interfaz
+      this.renderCartItems();
+      this.renderCartSummary();
+    }
+  }
+
+  /**
+   * Vacía todo el carrito y devuelve el stock
+   */
+  clearCart() {
+    // Confirmar antes de vaciar
+    if (!confirm('¿Estás seguro de que deseas vaciar el carrito?')) {
+      return;
     }
 
-    return cart;
+    // Devolver el stock de cada producto
+    Object.keys(this.cartItems).forEach(productId => {
+      const quantity = this.cartItems[productId];
+      this.updateProductStock(productId, quantity);
+    });
+
+    // Vaciar el carrito
+    this.cartItems = {};
+    this.saveCartToStorage();
+
+    // Notificar al usuario
+    NotificationManager.info('Carrito vaciado correctamente');
+
+    // Actualizar la interfaz
+    this.renderCartItems();
+    this.renderCartSummary();
+  }
+
+  /**
+   * Actualiza el stock de un producto y guarda en localStorage
+   */
+  updateProductStock(productId, quantityToAdd) {
+    const product = this.products.find(p => p.id === productId);
+    if (!product) return;
+
+    // Actualizar el stock
+    product.stock += quantityToAdd;
+
+    // Guardar en localStorage
+    localStorage.setItem(ProductService.STORAGE_KEY, JSON.stringify(this.products));
   }
 }
 
-export {CartService, CartsPage};
+export {CartsPage};
