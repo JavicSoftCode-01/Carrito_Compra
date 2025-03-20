@@ -969,7 +969,7 @@ body {
     .products-main .products-container{
         margin-top: -2rem;
     }
-    
+
     .product-card {
         width: calc(50% - 20px); /* 2 cards por fila */
     }
@@ -997,6 +997,10 @@ body {
     .notification-container{
     margin-top: 31.8px;
 
+    }
+
+    .btn-add-to-cart{
+        margin-bottom: 2rem;
     }
 }
 

@@ -1,7 +1,8 @@
-import { ProductService } from "./productServices.js";
-import { NotificationManager } from "../../../FrontEnd/public/assets/scripts/utils/showNotifications.js";
-import { AuthManager } from "./authServices.js";
-import { CategoryService } from "./categoryServices.js";
+import {ProductService} from "./productServices.js";
+import {NotificationManager} from "../../../FrontEnd/public/assets/scripts/utils/showNotifications.js";
+import {AuthManager} from "./authServices.js";
+import {CategoryService} from "./categoryServices.js";
+import {LocalStorageManager} from "../database/localStorage.js";
 
 /**
  * Clase para gestionar el carrito de compras
@@ -198,138 +199,57 @@ class CartsPage {
   }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/**
- * Renderiza el resumen del carrito y la factura
- */
-renderCartSummary() {
-  if (!this.cartSummary) return;
-
-  const cartItemIds = Object.keys(this.cartItems);
-
-  if (cartItemIds.length === 0) {
-    this.cartSummary.innerHTML = `
+  /**
+   * Renderiza el resumen del carrito y la factura
+   */
+  renderCartSummary() {
+    if (!this.cartSummary) return;
+
+    const cartItemIds = Object.keys(this.cartItems);
+
+    if (cartItemIds.length === 0) {
+      this.cartSummary.innerHTML = `
       <div class="invoice-header">
         <h2 class="invoice-title">Resumen de compra</h2>
         <p class="invoice-details">No hay productos en el carrito</p>
       </div>
     `;
-    return;
-  }
-
-  // Calcular totales
-  let subtotal = 0;
-  const items = [];
-
-  cartItemIds.forEach(productId => {
-    const product = this.products.find(p => p.id === productId);
-    if (product) {
-      const quantity = this.cartItems[productId];
-      const itemTotal = product.pvp * quantity;
-      subtotal += itemTotal;
-
-      items.push({
-        name: product.name,
-        price: product.pvp,
-        quantity: quantity,
-        total: itemTotal
-      });
+      return;
     }
-  });
 
-  const ivaAmount = subtotal * (this.ivaPercentage / 100);
-  const total = subtotal + ivaAmount;
-  const currentDate = new Date();
-  const formattedDate = `${currentDate.getDate()} de ${this.getMonthName(currentDate.getMonth())} de ${currentDate.getFullYear()}`;
-  const hours = currentDate.getHours();
-  const ampm = hours >= 12 ? 'PM' : 'AM';
-  const formattedHours = hours % 12 || 12;
-  const formattedTime = `${formattedHours}:${String(currentDate.getMinutes()).padStart(2, '0')} ${ampm}`;
-  const currentUser = AuthManager.getCurrentSession();
-  const invoiceNumber = this.invoiceNumber;
+    // Calcular totales
+    let subtotal = 0;
+    const items = [];
 
-  // Se renderiza la factura
-  this.cartSummary.innerHTML = `
+    cartItemIds.forEach(productId => {
+      const product = this.products.find(p => p.id === productId);
+      if (product) {
+        const quantity = this.cartItems[productId];
+        const itemTotal = product.pvp * quantity;
+        subtotal += itemTotal;
+
+        items.push({
+          name: product.name,
+          price: product.pvp,
+          quantity: quantity,
+          total: itemTotal
+        });
+      }
+    });
+
+    const ivaAmount = subtotal * (this.ivaPercentage / 100);
+    const total = subtotal + ivaAmount;
+    const currentDate = new Date();
+    const formattedDate = `${currentDate.getDate()} de ${this.getMonthName(currentDate.getMonth())} de ${currentDate.getFullYear()}`;
+    const hours = currentDate.getHours();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const formattedHours = hours % 12 || 12;
+    const formattedTime = `${formattedHours}:${String(currentDate.getMinutes()).padStart(2, '0')} ${ampm}`;
+    const currentUser = AuthManager.getCurrentSession();
+    const invoiceNumber = this.invoiceNumber;
+
+    // Se renderiza la factura
+    this.cartSummary.innerHTML = `
     <div class="invoice-header">
       <h2 class="invoice-title">Compra</h2>
       <div class="invoice-details">
@@ -390,13 +310,12 @@ renderCartSummary() {
         Realizar compra <i class="fa-brands fa-square-whatsapp fa-lg"></i>
       </button>
       <button class="clear-cart-btn">
-        <i class="fa-solid fa-trash-can fa-lg"></i> Vaciar carrito
-      </button>
+        <i class="fa-solid fa-trash-can fa-lg"></i> Vaciar carrito  
     </div>
   `;
 
-  // Estilos para los botones (se puede ajustar según necesidad)
-  const styles = `
+    // Estilos para los botones (se puede ajustar según necesidad)
+    const styles = `
     .button-container {
       display: flex;
       flex-direction: column;
@@ -421,45 +340,45 @@ renderCartSummary() {
       background-color: #128C7E;
     }
   `;
-  const styleSheet = document.createElement("style");
-  styleSheet.innerText = styles;
-  document.head.appendChild(styleSheet);
+    const styleSheet = document.createElement("style");
+    styleSheet.innerText = styles;
+    document.head.appendChild(styleSheet);
 
-  // Datos de la factura a utilizar en los flujos posteriores
-  const invoiceData = {
-    clientName: (currentUser && currentUser.full_name) ? currentUser.full_name : 'Cliente',
-    invoiceNumber: invoiceNumber,
-    date: formattedDate,
-    time: formattedTime,
-    items: items,
-    subtotal: subtotal,
-    ivaPercentage: this.ivaPercentage,
-    ivaAmount: ivaAmount,
-    total: total
-  };
+    // Datos de la factura a utilizar en los flujos posteriores
+    const invoiceData = {
+      clientName: (currentUser && currentUser.full_name) ? currentUser.full_name : 'Cliente',
+      invoiceNumber: invoiceNumber,
+      date: formattedDate,
+      time: formattedTime,
+      items: items,
+      subtotal: subtotal,
+      ivaPercentage: this.ivaPercentage,
+      ivaAmount: ivaAmount,
+      total: total
+    };
 
-  // --- NUEVO: FUNCIONALIDAD CON MODALES ---
+    // --- NUEVO: FUNCIONALIDAD CON MODALES ---
 
-  // Variable para guardar el temporizador global
-  let purchaseTimer = null;
+    // Variable para guardar el temporizador global
+    let purchaseTimer = null;
 
-  // Función para mostrar el modal de información de compra
-  const showPurchaseInfoModal = () => {
-    const modal = document.createElement('div');
-    modal.id = 'purchase-info-modal';
-    modal.style.position = 'fixed';
-    modal.style.top = '0';
-    modal.style.left = '0';
-    modal.style.width = '100%';
-    modal.style.height = '100%';
-    modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
-    modal.style.display = 'flex';
-    modal.style.justifyContent = 'center';
-    modal.style.alignItems = 'center';
-    modal.style.zIndex = '9999';
+    // Función para mostrar el modal de información de compra
+    const showPurchaseInfoModal = () => {
+      const modal = document.createElement('div');
+      modal.id = 'purchase-info-modal';
+      modal.style.position = 'fixed';
+      modal.style.top = '0';
+      modal.style.left = '0';
+      modal.style.width = '100%';
+      modal.style.height = '100%';
+      modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+      modal.style.display = 'flex';
+      modal.style.justifyContent = 'center';
+      modal.style.alignItems = 'center';
+      modal.style.zIndex = '9999';
 
-    // Contenido del modal con 3 botones centrados horizontalmente
-    modal.innerHTML = `
+      // Contenido del modal con 3 botones centrados horizontalmente
+      modal.innerHTML = `
       <div style="background-color: white; padding: 20px; border-radius: 8px; width: 400px; text-align: center;">
         <h3 style="color: #2196F3;">Información de Compra</h3>
         <p>Antes de proceder, por favor lee la información y elige una opción:</p>
@@ -470,69 +389,71 @@ renderCartSummary() {
         </div>
       </div>
     `;
-    document.body.appendChild(modal);
+      document.body.appendChild(modal);
 
-    // Evento para el botón de cancelar: cierra el modal sin hacer nada
-    document.getElementById('btn-cancel').addEventListener('click', () => {
-      document.body.removeChild(modal);
-    });
-
-    // Evento para el botón de chat: abre WhatsApp con mensaje predeterminado
-    document.getElementById('btn-chat').addEventListener('click', () => {
-      document.body.removeChild(modal);
-      const message = "Hola, deseo obtener ayuda con mi compra.";
-      shareToWhatsApp(message, '+593995336523');
-    });
-
-    // Evento para el botón de descargar PDF: inicia el flujo de compra
-    document.getElementById('btn-download').addEventListener('click', () => {
-      document.body.removeChild(modal);
-      handleDownloadFlow(invoiceData);
-    });
-  };
-
-  // Función que maneja el flujo cuando se pulsa “Descargar PDF”
-  const handleDownloadFlow = (invoiceData) => {
-    // Generar y descargar el PDF (se usa la función ya implementada en el código original)
-    generateInvoicePDF(invoiceData)
-      .then(({ fileName, pdfBlob, pdfBase64 }) => {
-        // Descargar PDF
-        return downloadPDF(fileName, pdfBlob)
-          .then(success => {
-            if (!success) {
-              fallbackDownload(fileName, pdfBase64);
-            }
-            // Después de descargar, mostrar modal de confirmación
-            showConfirmationModal(fileName, invoiceData);
-          })
-          .catch(() => {
-            fallbackDownload(fileName, pdfBase64);
-            showConfirmationModal(fileName, invoiceData);
-          });
-      })
-      .catch(error => {
-        console.error('Error al generar o descargar el PDF:', error);
-        showNotification('Error al generar o descargar el PDF. Por favor, intenta de nuevo.', true);
+      // Evento para el botón de cancelar: cierra el modal sin hacer nada
+      document.getElementById('btn-cancel').addEventListener('click', () => {
+        document.body.removeChild(modal);
       });
-  };
 
-  // Modal de confirmación: "Seguir" o "Cancelar" la compra
- // Modal de confirmación: "Seguir" o "Cancelar" la compra
-const showConfirmationModal = (fileName, invoiceData) => {
-  const modal = document.createElement('div');
-  modal.id = 'confirmation-modal';
-  modal.style.position = 'fixed';
-  modal.style.top = '0';
-  modal.style.left = '0';
-  modal.style.width = '100%';
-  modal.style.height = '100%';
-  modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
-  modal.style.display = 'flex';
-  modal.style.justifyContent = 'center';
-  modal.style.alignItems = 'center';
-  modal.style.zIndex = '9999';
+      // Evento para el botón de chat: abre WhatsApp con mensaje predeterminado
+      document.getElementById('btn-chat').addEventListener('click', () => {
+        document.body.removeChild(modal);
+        const message = "Hola, deseo obtener ayuda con mi compra.";
+        shareToWhatsApp(message, '+593995336523');
+      });
 
-  modal.innerHTML = `
+      // Evento para el botón de descargar PDF: inicia el flujo de compra
+      document.getElementById('btn-download').addEventListener('click', () => {
+        document.body.removeChild(modal);
+        NotificationManager.info("Compra en proceso. Tiene 2 minutos para cancelar la orden de compra.");
+
+        handleDownloadFlow(invoiceData);
+      });
+    };
+
+    // Función que maneja el flujo cuando se pulsa “Descargar PDF”
+    const handleDownloadFlow = (invoiceData) => {
+      // Generar y descargar el PDF (se usa la función ya implementada en el código original)
+      generateInvoicePDF(invoiceData)
+        .then(({fileName, pdfBlob, pdfBase64}) => {
+          // Descargar PDF
+          return downloadPDF(fileName, pdfBlob)
+            .then(success => {
+              if (!success) {
+                fallbackDownload(fileName, pdfBase64);
+              }
+              // Después de descargar, mostrar modal de confirmación
+              showConfirmationModal(fileName, invoiceData);
+            })
+            .catch(() => {
+              fallbackDownload(fileName, pdfBase64);
+              showConfirmationModal(fileName, invoiceData);
+            });
+        })
+        .catch(error => {
+          console.error('Error al generar o descargar el PDF:', error);
+          NotificationManager.error('Error al generar o descargar el PDF. Por favor, intenta de nuevo.');
+        });
+    };
+
+    // Modal de confirmación: "Seguir" o "Cancelar" la compra
+    // Modal de confirmación: "Seguir" o "Cancelar" la compra
+    const showConfirmationModal = (fileName, invoiceData) => {
+      const modal = document.createElement('div');
+      modal.id = 'confirmation-modal';
+      modal.style.position = 'fixed';
+      modal.style.top = '0';
+      modal.style.left = '0';
+      modal.style.width = '100%';
+      modal.style.height = '100%';
+      modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+      modal.style.display = 'flex';
+      modal.style.justifyContent = 'center';
+      modal.style.alignItems = 'center';
+      modal.style.zIndex = '9999';
+
+      modal.innerHTML = `
     <div style="background-color: white; padding: 20px; border-radius: 8px; width: 350px; text-align: center;">
       <p>Si deseas cancelar la compra, haz clic en "Cancelar".<br>Si deseas continuar, haz clic en "Seguir".</p>
       <div style="display: flex; justify-content: space-around; margin-top: 20px;">
@@ -541,56 +462,56 @@ const showConfirmationModal = (fileName, invoiceData) => {
       </div>
     </div>
   `;
-  document.body.appendChild(modal);
+      document.body.appendChild(modal);
 
-  // Si el usuario decide seguir con la compra:
-  document.getElementById('confirm-seguir').addEventListener('click', () => {
-    document.body.removeChild(modal);
-    // Inicia temporizador de 1 minuto para actualizar stock y limpiar el carrito
-    purchaseTimer = setTimeout(() => {
-      // Actualizar el stock en localStorage o en la lógica de negocio según corresponda
-      cartItemIds.forEach(productId => {
-        // Ejemplo: localStorage.removeItem(`stock_${productId}_${this.cartItems[productId]}`);
+      // Si el usuario decide seguir con la compra:
+      document.getElementById('confirm-seguir').addEventListener('click', () => {
+        document.body.removeChild(modal);
+        // Inicia temporizador de 1 minuto para actualizar stock y limpiar el carrito
+        purchaseTimer = setTimeout(() => {
+          // Actualizar el stock en localStorage o en la lógica de negocio según corresponda
+          cartItemIds.forEach(productId => {
+            // Ejemplo: localStorage.removeItem(`stock_${productId}_${this.cartItems[productId]}`);
+          });
+          // Limpiar el carrito y actualizar tanto la factura como las tarjetas de items
+          this.cartItems = {};
+          LocalStorageManager.removeData(this.CART_STORAGE_KEY)
+          this.renderCartSummary();
+          this.renderCartItems();
+          NotificationManager.success("Compra finalizada.");
+        }, 5000); // 60000 milisegundos = 1 minuto
       });
-      // Limpiar el carrito y actualizar tanto la factura como las tarjetas de items
-      this.cartItems = {};
-      this.renderCartSummary();
-      this.renderCartItems();
-      showNotification("Compra finalizada. Stock actualizado y carrito limpiado.");
-    }, 60000); // 60000 milisegundos = 1 minuto
-    showNotification("Compra en proceso. Se actualizará el stock en 1 minuto.");
-  });
 
-  // Si el usuario decide cancelar la compra:
-  document.getElementById('confirm-cancelar').addEventListener('click', () => {
-    document.body.removeChild(modal);
-    // Cancelar el temporizador si está en curso
-    if (purchaseTimer) {
-      clearTimeout(purchaseTimer);
-      purchaseTimer = null;
-    }
-    // Mostrar modal informativo de cancelación
-    showCancellationModal();
-  });
-};
+      // Si el usuario decide cancelar la compra:
+      document.getElementById('confirm-cancelar').addEventListener('click', () => {
+        document.body.removeChild(modal);
+        // Cancelar el temporizador si está en curso
+        if (purchaseTimer) {
+          clearTimeout(purchaseTimer);
+          purchaseTimer = null;
+        }
+        // Mostrar modal informativo de cancelación
+        showCancellationModal();
+      });
+    };
 
 
-  // Modal para informar la cancelación de la compra
-  const showCancellationModal = () => {
-    const modal = document.createElement('div');
-    modal.id = 'cancelation-modal';
-    modal.style.position = 'fixed';
-    modal.style.top = '0';
-    modal.style.left = '0';
-    modal.style.width = '100%';
-    modal.style.height = '100%';
-    modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
-    modal.style.display = 'flex';
-    modal.style.justifyContent = 'center';
-    modal.style.alignItems = 'center';
-    modal.style.zIndex = '9999';
+    // Modal para informar la cancelación de la compra
+    const showCancellationModal = () => {
+      const modal = document.createElement('div');
+      modal.id = 'cancelation-modal';
+      modal.style.position = 'fixed';
+      modal.style.top = '0';
+      modal.style.left = '0';
+      modal.style.width = '100%';
+      modal.style.height = '100%';
+      modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+      modal.style.display = 'flex';
+      modal.style.justifyContent = 'center';
+      modal.style.alignItems = 'center';
+      modal.style.zIndex = '9999';
 
-    modal.innerHTML = `
+      modal.innerHTML = `
       <div style="background-color: white; padding: 20px; border-radius: 8px; width: 350px; text-align: center;">
         <h3 style="color: #F44336;">Compra Cancelada</h3>
         <p>Has cancelado la compra. ¿Deseas informar el motivo?</p>
@@ -600,85 +521,85 @@ const showConfirmationModal = (fileName, invoiceData) => {
         </div>
       </div>
     `;
-    document.body.appendChild(modal);
+      document.body.appendChild(modal);
 
-    document.getElementById('cancel-whatsapp').addEventListener('click', () => {
-      document.body.removeChild(modal);
-      const message = "He cancelado mi compra. Motivo: [escribe tu motivo aquí]";
-      shareToWhatsApp(message, '+593995336523');
-    });
-    document.getElementById('cancel-close').addEventListener('click', () => {
-      document.body.removeChild(modal);
-    });
-  };
+      document.getElementById('cancel-whatsapp').addEventListener('click', () => {
+        document.body.removeChild(modal);
+        const message = "He cancelado mi compra. Motivo: [escribe tu motivo aquí]";
+        shareToWhatsApp(message, '+593995336523');
+      });
+      document.getElementById('cancel-close').addEventListener('click', () => {
+        document.body.removeChild(modal);
+      });
+    };
 
-  // --- FIN DE NUEVA FUNCIONALIDAD CON MODALES ---
+    // --- FIN DE NUEVA FUNCIONALIDAD CON MODALES ---
 
-  // Asignar el evento al botón “Realizar compra” para que abra el modal de información
-  const purchaseBtn = this.cartSummary.querySelector('.purchase-btn');
-  if (purchaseBtn) {
-    // Para evitar duplicados, se reemplaza el nodo y se agrega el listener
-    purchaseBtn.replaceWith(purchaseBtn.cloneNode(true));
-    this.cartSummary.querySelector('.purchase-btn').addEventListener('click', () => {
-      showPurchaseInfoModal();
-    });
-  }
+    // Asignar el evento al botón “Realizar compra” para que abra el modal de información
+    const purchaseBtn = this.cartSummary.querySelector('.purchase-btn');
+    if (purchaseBtn) {
+      // Para evitar duplicados, se reemplaza el nodo y se agrega el listener
+      purchaseBtn.replaceWith(purchaseBtn.cloneNode(true));
+      this.cartSummary.querySelector('.purchase-btn').addEventListener('click', () => {
+        showPurchaseInfoModal();
+      });
+    }
 
-  // --- Funciones ya existentes: generateInvoicePDF, downloadPDF, fallbackDownload, shareToWhatsApp, showNotification ---
-  // Estas funciones se mantienen (o se adaptan levemente) según el código original.
+    // --- Funciones ya existentes: generateInvoicePDF, downloadPDF, fallbackDownload, shareToWhatsApp, showNotification ---
+    // Estas funciones se mantienen (o se adaptan levemente) según el código original.
 
-  // Función para generar el PDF de la factura con mejor manejo de errores
-  function generateInvoicePDF(invoiceData) {
-    return new Promise((resolve, reject) => {
-      try {
-        // Verificar si jsPDF ya está disponible
-        if (typeof window.jspdf === 'undefined') {
-          console.log("cargando jsPDF...");
-          // Cargar jsPDF dinámicamente
-          const script = document.createElement('script');
-          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-          script.async = true;
+    // Función para generar el PDF de la factura con mejor manejo de errores
+    function generateInvoicePDF(invoiceData) {
+      return new Promise((resolve, reject) => {
+        try {
+          // Verificar si jsPDF ya está disponible
+          if (typeof window.jspdf === 'undefined') {
+            console.log("cargando jsPDF...");
+            // Cargar jsPDF dinámicamente
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+            script.async = true;
 
-          script.onload = () => {
-            console.log("jsPDF cargado, cargando autoTable...");
-            // Una vez cargado jsPDF, cargar autoTable
-            const autoTableScript = document.createElement('script');
-            autoTableScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js';
-            autoTableScript.async = true;
+            script.onload = () => {
+              console.log("jsPDF cargado, cargando autoTable...");
+              // Una vez cargado jsPDF, cargar autoTable
+              const autoTableScript = document.createElement('script');
+              autoTableScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js';
+              autoTableScript.async = true;
 
-            autoTableScript.onload = () => {
-              console.log("autoTable cargado, generando PDF...");
-              // Una vez cargados ambos, crear el PDF
-              createPDF(invoiceData, resolve, reject);
+              autoTableScript.onload = () => {
+                console.log("autoTable cargado, generando PDF...");
+                // Una vez cargados ambos, crear el PDF
+                createPDF(invoiceData, resolve, reject);
+              };
+
+              autoTableScript.onerror = (e) => {
+                console.error("Error cargando autoTable:", e);
+                reject(new Error('No se pudo cargar la biblioteca jspdf-autotable'));
+              };
+
+              document.head.appendChild(autoTableScript);
             };
 
-            autoTableScript.onerror = (e) => {
-              console.error("Error cargando autoTable:", e);
-              reject(new Error('No se pudo cargar la biblioteca jspdf-autotable'));
+            script.onerror = (e) => {
+              console.error("Error cargando jsPDF:", e);
+              reject(new Error('No se pudo cargar la biblioteca jsPDF'));
             };
 
-            document.head.appendChild(autoTableScript);
-          };
-
-          script.onerror = (e) => {
-            console.error("Error cargando jsPDF:", e);
-            reject(new Error('No se pudo cargar la biblioteca jsPDF'));
-          };
-
-          document.head.appendChild(script);
-        } else {
-          console.log("jsPDF ya disponible, generando PDF directamente");
-          // Si jsPDF ya está disponible, crear el PDF directamente
-          createPDF(invoiceData, resolve, reject);
+            document.head.appendChild(script);
+          } else {
+            console.log("jsPDF ya disponible, generando PDF directamente");
+            // Si jsPDF ya está disponible, crear el PDF directamente
+            createPDF(invoiceData, resolve, reject);
+          }
+        } catch (error) {
+          console.error("Error general en generateInvoicePDF:", error);
+          reject(error);
         }
-      } catch (error) {
-        console.error("Error general en generateInvoicePDF:", error);
-        reject(error);
-      }
-    });
-  }
+      });
+    }
 
-  
+
     // Función simplificada para descargar el PDF
     function downloadPDF(fileName, pdfBlob) {
       return new Promise((resolve, reject) => {
@@ -774,85 +695,77 @@ const showConfirmationModal = (fileName, invoiceData) => {
 
 
 
-    // Función para mostrar notificación de éxito
-    function showNotification(message, isError = false) {
-      // Eliminar notificaciones anteriores
-      const existingNotifications = document.querySelectorAll('.pdf-notification');
-      existingNotifications.forEach(notif => {
-        document.body.removeChild(notif);
-      });
 
-      // Crear notificación
-      const notification = document.createElement('div');
-      notification.className = 'pdf-notification';
-      notification.style.position = 'fixed';
-      notification.style.bottom = '20px';
-      notification.style.left = '50%';
-      notification.style.transform = 'translateX(-50%)';
-      notification.style.backgroundColor = isError ? '#F44336' : '#4CAF50';
-      notification.style.color = 'white';
-      notification.style.padding = '12px 24px';
-      notification.style.borderRadius = '5px';
-      notification.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
-      notification.style.zIndex = '9999';
-      notification.style.textAlign = 'center';
-      notification.style.maxWidth = '80%';
-      notification.style.minWidth = '250px';
-
-      // Icono según el tipo
-      const icon = isError
-        ? '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>'
-        : '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
-
-      notification.innerHTML = `
-    <div style="display: flex; align-items: center; gap: 12px;">
-      ${icon}
-      <span>${message}</span>
-    </div>
-  `;
-
-      document.body.appendChild(notification);
-
-      // Eliminar notificación después de 5 segundos
-      setTimeout(() => {
-        if (document.body.contains(notification)) {
-          document.body.removeChild(notification);
-        }
-      }, 5000);
-    }
-
-    
     // Función separada para crear el PDF
     function createPDF(invoiceData, resolve, reject) {
       try {
-        console.log("Iniciando creación del PDF...");
-
         // Verificar que jsPDF esté disponible
         if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) {
           throw new Error('jsPDF no está disponible en el contexto global');
         }
 
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
+        const {jsPDF} = window.jspdf;
+        const doc = new jsPDF({
+          orientation: 'p',
+          unit: 'pt',
+          format: 'letter' // o 'a4' según prefieras
+        });
 
-        console.log("Creando documento PDF...");
+        // Márgenes y posiciones base
+        const pageWidth = doc.internal.pageSize.getWidth();
+        let cursorY = 40;  // Posición vertical inicial
+        const marginX = 40;
 
-        // Encabezado del documento
+        // ==========================
+        // ENCABEZADO PRINCIPAL
+        // ==========================
+
+        // Dibujar un recuadro “tipo tarjeta” en la parte superior (opcional)
+        // Cambia los valores de color fill si quieres otro tono
+        // Relleno gris claro
+        doc.setFillColor(245, 245, 245);
+// Dibuja el rectángulo sin esquinas redondeadas
+        doc.rect(
+          marginX - 10,
+          cursorY - 15,
+          pageWidth - (marginX - 10) * 2,
+          80,
+          'F'
+        );
+
+
+        // Título principal: "Compra"
         doc.setFontSize(22);
-        doc.text("Compra", 105, 20, { align: 'center' });
+        doc.setTextColor(0, 0, 0);
+        doc.setFont(undefined, 'bold'); doc.text("Compra", pageWidth / 2, cursorY, {align: 'center'}); doc.setFont(undefined, 'normal');
 
-        // Información del cliente y factura
+        // Subir un poco cursorY para acomodar textos debajo
+        cursorY += 15;
+
+        // Información del cliente a la izquierda
         doc.setFontSize(12);
-        doc.text(`Cliente: ${invoiceData.clientName}`, 20, 35);
-        doc.text(`${invoiceData.invoiceNumber}`, 20, 42);
-        doc.text(`Fecha: ${invoiceData.date}`, 20, 49);
-        doc.text(`Hora: ${invoiceData.time}`, 20, 56);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`Cliente: ${invoiceData.clientName}`, marginX, cursorY);
 
-        // Título de detalle de compra
+        // Información de factura a la derecha
+        // Alineamos el texto hacia la derecha para que se vea “FAC-xxxx” en el lado opuesto
+        doc.text(`${invoiceData.invoiceNumber}`, pageWidth - marginX, cursorY, {align: 'right'});
+        cursorY += 15;
+
+        // Fecha y hora (podrías ponerlos en la misma línea o en líneas separadas)
+        doc.text(`Fecha: ${invoiceData.date}`, marginX, cursorY);
+        cursorY += 12;
+        doc.text(`Hora: ${invoiceData.time}`, marginX, cursorY);
+        cursorY += 30; // Dejamos un espacio antes del detalle
+
+        // ==========================
+        // DETALLE DE COMPRA
+        // ==========================
         doc.setFontSize(16);
-        doc.text("Detalle de Compra", 20, 70);
+        doc.setFont(undefined, 'bold'); doc.text("Detalle de Compra", marginX, cursorY); doc.setFont(undefined, 'normal');
+        cursorY += 10;
 
-        // Tabla de productos
+        // Preparamos columnas para la tabla
         const tableColumn = ["Producto", "Cant.", "Precio", "Total"];
         const tableRows = [];
 
@@ -866,127 +779,170 @@ const showConfirmationModal = (fileName, invoiceData) => {
           tableRows.push(itemData);
         });
 
-        // Verificar que autoTable esté disponible
-        if (typeof doc.autoTable !== 'function') {
-          throw new Error('autoTable no está disponible en el objeto jsPDF');
-        }
-
+        // Renderizamos la tabla con autoTable
+        // Ajustamos startY para que aparezca debajo del título "Detalle de Compra"
         doc.autoTable({
           head: [tableColumn],
           body: tableRows,
-          startY: 75,
-          theme: 'striped',
+          startY: cursorY,
+          theme: 'striped', // prueba también 'grid' o 'plain'
           styles: {
             fontSize: 10,
             cellPadding: 3,
           },
+          headStyles: {
+            fillColor: [240, 240, 240], // color de fondo del encabezado
+            textColor: [0, 0, 0],
+            lineWidth: 0.5,
+          }
         });
 
-        // Información de totales
-        const finalY = doc.lastAutoTable.finalY + 10;
-        doc.text(`Subtotal:`, 130, finalY);
-        doc.text(`$${invoiceData.subtotal.toFixed(2)}`, 170, finalY, { align: 'right' });
-        doc.text(`IVA (${invoiceData.ivaPercentage}%):`, 130, finalY + 7);
-        doc.text(`$${invoiceData.ivaAmount.toFixed(2)}`, 170, finalY + 7, { align: 'right' });
-        doc.setFontSize(14);
-        doc.text(`Total:`, 130, finalY + 15);
-        doc.setTextColor(0, 128, 0); // Color verde para el total
-        doc.text(`$${invoiceData.total.toFixed(2)}`, 170, finalY + 15, { align: 'right' });
-        doc.setTextColor(0, 0, 0); // Restablecer color
+        // Obtenemos la posición final de la tabla para imprimir los totales debajo
+        let finalY = doc.lastAutoTable.finalY + 20;
 
-        // Nombre del archivo limpio para evitar problemas
+        // ==========================
+        // SECCIÓN DE TOTALES
+        // ==========================
+        doc.setFontSize(12);
+        // Subtotal
+        doc.text(`Subtotal:`, pageWidth - 200, finalY);
+        doc.text(`$${invoiceData.subtotal.toFixed(2)}`, pageWidth - 40, finalY, {align: 'right'});
+
+        // IVA
+        finalY += 30;
+        doc.text(`IVA (${invoiceData.ivaPercentage}%):`, pageWidth - 200, finalY);
+        doc.text(`$${invoiceData.ivaAmount.toFixed(2)}`, pageWidth - 40, finalY, {align: 'right'});
+
+        // Total (en verde y un poco más grande)
+        finalY += 30;
+        doc.setFontSize(14);
+        doc.text(`Total:`, pageWidth - 200, finalY);
+        doc.setTextColor(0, 128, 0); // Color verde
+        doc.text(`$${invoiceData.total.toFixed(2)}`, pageWidth - 40, finalY, {align: 'right'});
+        // Restablecemos color a negro
+        doc.setTextColor(0, 0, 0);
+
+        // ==========================
+        // CREACIÓN DEL BLOB Y RESOLVER
+        // ==========================
         const timestamp = new Date().getTime();
         const cleanClientName = invoiceData.clientName.replace(/[^a-zA-Z0-9]/g, '_');
-        const fileName = `Factura_${cleanClientName}_${invoiceNumber}.pdf`;
+        // Asegúrate de que invoiceData.invoiceNumber esté disponible como variable
+        const fileName = `Factura_${cleanClientName}_${invoiceData.invoiceNumber}.pdf`;
 
-        console.log("PDF generado, creando blob...");
+        const pdfBlob = doc.output('blob');
 
-        // Crear blob del PDF y resolver la promesa
-        try {
-          const pdfBlob = doc.output('blob');
-          console.log("Blob creado correctamente");
-          resolve({
-            fileName,
-            pdfBlob,
-            pdfBase64: doc.output('datauristring')
-          });
-        } catch (e) {
-          console.error("Error al crear blob:", e);
-          reject(e);
-        }
+        resolve({
+          fileName,
+          pdfBlob,
+          pdfBase64: doc.output('datauristring')
+        });
 
       } catch (error) {
-        console.error("Error en createPDF:", error);
         reject(error);
       }
     }
 
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    // function createPDF(invoiceData, resolve, reject) {
+    //   try {
+    //     console.log("Iniciando creación del PDF...");
+    //
+    //     // Verificar que jsPDF esté disponible
+    //     if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) {
+    //       throw new Error('jsPDF no está disponible en el contexto global');
+    //     }
+    //
+    //     const {jsPDF} = window.jspdf;
+    //     const doc = new jsPDF();
+    //
+    //     console.log("Creando documento PDF...");
+    //
+    //     // Encabezado del documento
+    //     doc.setFontSize(22);
+    //     doc.text("Compra", 105, 20, {align: 'center'});
+    //
+    //     // Información del cliente y factura
+    //     doc.setFontSize(12);
+    //     doc.text(`Cliente: ${invoiceData.clientName}`, 20, 35);
+    //     doc.text(`${invoiceData.invoiceNumber}`, 20, 42);
+    //     doc.text(`Fecha: ${invoiceData.date}`, 20, 49);
+    //     doc.text(`Hora: ${invoiceData.time}`, 20, 56);
+    //
+    //     // Título de detalle de compra
+    //     doc.setFontSize(16);
+    //     doc.text("Detalle de Compra", 20, 70);
+    //
+    //     // Tabla de productos
+    //     const tableColumn = ["Producto", "Cant.", "Precio", "Total"];
+    //     const tableRows = [];
+    //
+    //     invoiceData.items.forEach(item => {
+    //       const itemData = [
+    //         item.name,
+    //         item.quantity,
+    //         `$${item.price.toFixed(2)}`,
+    //         `$${item.total.toFixed(2)}`
+    //       ];
+    //       tableRows.push(itemData);
+    //     });
+    //
+    //     // Verificar que autoTable esté disponible
+    //     if (typeof doc.autoTable !== 'function') {
+    //       throw new Error('autoTable no está disponible en el objeto jsPDF');
+    //     }
+    //
+    //     doc.autoTable({
+    //       head: [tableColumn],
+    //       body: tableRows,
+    //       startY: 75,
+    //       theme: 'striped',
+    //       styles: {
+    //         fontSize: 10,
+    //         cellPadding: 3,
+    //       },
+    //     });
+    //
+    //     // Información de totales
+    //     const finalY = doc.lastAutoTable.finalY + 10;
+    //     doc.text(`Subtotal:`, 130, finalY);
+    //     doc.text(`$${invoiceData.subtotal.toFixed(2)}`, 170, finalY, {align: 'right'});
+    //     doc.text(`IVA (${invoiceData.ivaPercentage}%):`, 130, finalY + 7);
+    //     doc.text(`$${invoiceData.ivaAmount.toFixed(2)}`, 170, finalY + 7, {align: 'right'});
+    //     doc.setFontSize(14);
+    //     doc.text(`Total:`, 130, finalY + 15);
+    //     doc.setTextColor(0, 128, 0); // Color verde para el total
+    //     doc.text(`$${invoiceData.total.toFixed(2)}`, 170, finalY + 15, {align: 'right'});
+    //     doc.setTextColor(0, 0, 0); // Restablecer color
+    //
+    //     // Nombre del archivo limpio para evitar problemas
+    //     const timestamp = new Date().getTime();
+    //     const cleanClientName = invoiceData.clientName.replace(/[^a-zA-Z0-9]/g, '_');
+    //     const fileName = `Factura_${cleanClientName}_${invoiceNumber}.pdf`;
+    //
+    //     console.log("PDF generado, creando blob...");
+    //
+    //     // Crear blob del PDF y resolver la promesa
+    //     try {
+    //       const pdfBlob = doc.output('blob');
+    //       console.log("Blob creado correctamente");
+    //       resolve({
+    //         fileName,
+    //         pdfBlob,
+    //         pdfBase64: doc.output('datauristring')
+    //       });
+    //     } catch (e) {
+    //       console.error("Error al crear blob:", e);
+    //       reject(e);
+    //     }
+    //
+    //   } catch (error) {
+    //     console.error("Error en createPDF:", error);
+    //     reject(error);
+    //   }
+    // }
+
+
+  }
 
 
   /**
@@ -1122,4 +1078,4 @@ const showConfirmationModal = (fileName, invoiceData) => {
   }
 }
 
-export { CartsPage };
+export {CartsPage};
