@@ -1,14 +1,14 @@
 import { AdminPanel } from '../../../../BackEnd/src/admin/AdminPanel.js';
-import { AuthManager } from "../../../../BackEnd/src/services/authServices.js";
+//import { AuthManager } from "../../../../BackEnd/src/services/authServices.js";
 import { CardsProductService } from "../../../../BackEnd/src/services/cardsProductServices.js";
 import { CartsPage } from "../../../../BackEnd/src/services/cartsServices.js";
 
 document.addEventListener('DOMContentLoaded', () => {
   // Verifica la autenticación; si falla, AuthManager redirige al login.
-  if (!AuthManager.verifyAuthentication()) return;
+  //if (!AuthManager.verifyAuthentication()) return;
 
   // Muestra el nombre completo del usuario logueado y maneja cerrar sesión.
-  new AuthManager().init();
+  //new AuthManager().init();
 
   // Obtiene la ruta actual del archivo HTML
   const currentPage = window.location.pathname;

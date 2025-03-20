@@ -592,38 +592,87 @@ class AdminPanel {
   /**
    * Maneja la edición de un Producto.
    */
-  handleEditProduct(id) {
-    this.lastTableModalCallback = () => {
-      const productsNew = ProductService.getAllProducts();
-      const categoriesNew = CategoryService.getAllCategories();
-      const suppliersNew = SupplierService.getAllSuppliers();
-      const newTableHTML = this.tableManager.generateProductTable(
-        productsNew,
-        categoriesNew,
-        suppliersNew
-      );
-      if (productsNew.length > 0) {
-        this.modalManager.showTableModal("Listado de Productos", newTableHTML);
-        this.configureTableButtons();
-      } else {
-        this.modalManager.closeTableModal();
-      }
-    };
-    this.modalManager.closeTableModal();
-    const product = ProductService.getProductById(id);
-    if (product) {
-      const formHTML = this.modalManager.updateProductForm(product);
-      this.modalManager.showFormModal("Editar Producto", formHTML);
-      this.attachCancelListener();
-      const productForm = document.getElementById("product-form");
-      if (productForm) {
-        productForm.addEventListener("submit", (e) => {
-          e.preventDefault();
-          this.handleProductFormSubmit(true);
-        }, {once: true});
-      }
+ // handleEditProduct(id) {
+ //   this.lastTableModalCallback = () => {
+ //     const productsNew = ProductService.getAllProducts();
+ //     const categoriesNew = CategoryService.getAllCategories();
+ //     const suppliersNew = SupplierService.getAllSuppliers();
+ //     const newTableHTML = this.tableManager.generateProductTable(
+ //       productsNew,
+ //       categoriesNew,
+ //       suppliersNew
+ //     );
+ //     if (productsNew.length > 0) {
+ //       this.modalManager.showTableModal("Listado de Productos", newTableHTML);
+ //       this.configureTableButtons();
+ //     } else {
+ //       this.modalManager.closeTableModal();
+ //     }
+ //   };
+ //   this.modalManager.closeTableModal();
+ //   const product = ProductService.getProductById(id);
+ //   if (product) {
+ //     const formHTML = this.modalManager.createProductForm(product); // aqui condicion para que se abra el mismo formulario de crear, cuando se de click en el btn de actualizar
+ //     this.modalManager.showFormModal("Editar Producto", formHTML);
+ //     this.attachCancelListener();
+ //     const productForm = document.getElementById("product-form");
+ //     if (productForm) {
+ //       productForm.addEventListener("submit", (e) => {
+ //         e.preventDefault();
+ //         this.handleProductFormSubmit(true);
+ //       }, {once: true});
+ //     }
+ //   }
+ // }
+ handleEditProduct(id) {
+  this.lastTableModalCallback = () => {
+    const productsNew = ProductService.getAllProducts();
+    const categoriesNew = CategoryService.getAllCategories();
+    const suppliersNew = SupplierService.getAllSuppliers();
+    const newTableHTML = this.tableManager.generateProductTable(
+      productsNew,
+      categoriesNew,
+      suppliersNew
+    );
+    if (productsNew.length > 0) {
+      this.modalManager.showTableModal("Listado de Productos", newTableHTML);
+      this.configureTableButtons();
+    } else {
+      this.modalManager.closeTableModal();
+    }
+  };
+
+  this.modalManager.closeTableModal();
+  const product = ProductService.getProductById(id);
+  if (product) {
+    const formHTML = this.modalManager.createProductForm(product);
+    this.modalManager.showFormModal("Editar Producto", formHTML);
+    this.attachCancelListener();
+
+    const productForm = document.getElementById("product-form");
+    if (productForm) {
+      // Seleccionar los inputs de cantidad y stock
+      const quantityInput = productForm.querySelector("#product-quantity");
+      const stockInput = productForm.querySelector("#product-stock");
+
+      // Guardamos el valor inicial de cantidad
+      const initialQuantity = quantityInput.value;
+
+      // Si el usuario cambia el valor de cantidad, actualizamos el stock
+      quantityInput.addEventListener("input", () => {
+        if (quantityInput.value !== initialQuantity) {
+          stockInput.value = quantityInput.value;
+        }
+      });
+
+      productForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        this.handleProductFormSubmit(true);
+      }, { once: true });
     }
   }
+}
+
 
   /**
    * Maneja la eliminación de un Producto.
