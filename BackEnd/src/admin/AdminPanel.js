@@ -33,6 +33,14 @@ class AdminPanel {
     this.bindUIActions();
     this.loadWidgets();
     this.initCharts();
+
+    this.actualizarGananciaTotal();
+  this.actualizarProductosVendidos();
+
+  document.addEventListener('saleConfirmed', () => {
+    this.actualizarGananciaTotal();
+    this.actualizarProductosVendidos();
+  });
   }
 
   /**
@@ -238,99 +246,74 @@ class AdminPanel {
   /**
    * Actualiza los widgets con datos actuales.
    */
-  //loadWidgets() {
-  //  const products = ProductService.getAllProducts();
-  //  const categories = CategoryService.getAllCategories();
-  //  const suppliers = SupplierService.getAllSuppliers();
-//
-  //  const productsCountElement = document.getElementById('widget-total-productos');
-  //  const categoriesCountElement = document.getElementById('widget-total-categorias');
-  //  const suppliersCountElement = document.getElementById('widget-total-proveedores');
-  //  const inventoryValueElement = document.getElementById('widget-total-capital');
-  //  const capitalInvertidoElement = document.getElementById('widget-capital-invertido');
-  //  const productosVendidosElement = document.getElementById('widget-productos-vendidos');
-  //  const gananciaTotalElement = document.getElementById('widget-ganancia-total');
-//
-  //  if (productsCountElement) productsCountElement.textContent = products.length;
-  //  if (categoriesCountElement) categoriesCountElement.textContent = categories.length;
-  //  if (suppliersCountElement) suppliersCountElement.textContent = suppliers.length;
-//
-  //  const inventoryValue = products.reduce((total, product) => {
-  //    return total + (parseFloat(product.price) * parseInt(product.stock));
-  //  }, 0);
-  //  if (inventoryValueElement) {
-  //    inventoryValueElement.textContent = `${inventoryValue.toFixed(2)}`;
-  //  }
-//
-  //  const capitalInvertido = products.reduce((total, product) => {
-  //    return total + (parseFloat(product.price) * parseInt(product.quantity));
-  //  }, 0);
-  //  if (capitalInvertidoElement) {
-  //    capitalInvertidoElement.textContent = `${capitalInvertido.toFixed(2)}`;
-  //  }
-//
-  //  const productosVendidos = products.reduce((sum, product) => {
-  //    return sum + (parseInt(product.quantity) - parseInt(product.stock));
-  //  }, 0);
-  //  if (productosVendidosElement) {
-  //    productosVendidosElement.textContent = productosVendidos;
-  //  }
-//
-  //  const gananciaTotal = products.reduce((sum, product) => {
-  //    return sum + ((parseInt(product.quantity) - parseInt(product.stock)) * parseFloat(product.pvp));
-  //  }, 0);
-  //  if (gananciaTotalElement) {
-  //    gananciaTotalElement.textContent = `${gananciaTotal.toFixed(2)}`;
-  //  }
-  //}
-
   loadWidgets() {
     const products = ProductService.getAllProducts();
     const categories = CategoryService.getAllCategories();
     const suppliers = SupplierService.getAllSuppliers();
-
+  
     const productsCountElement = document.getElementById('widget-total-productos');
     const categoriesCountElement = document.getElementById('widget-total-categorias');
     const suppliersCountElement = document.getElementById('widget-total-proveedores');
     const inventoryValueElement = document.getElementById('widget-total-capital');
-
-    // Añadir los widgets nuevos
-    const productosVendidosElement = document.getElementById('widget-productos-vendidos');
-    const gananciaTotalElement = document.getElementById('widget-ganancia-total');
-
+  
     if (productsCountElement) productsCountElement.textContent = products.length;
     if (categoriesCountElement) categoriesCountElement.textContent = categories.length;
     if (suppliersCountElement) suppliersCountElement.textContent = suppliers.length;
-
+  
     // Cálculo del valor total del inventario (capital actual)
     const inventoryValue = products.reduce((total, product) => {
       return total + (parseFloat(product.price) * parseInt(product.stock));
     }, 0);
     if (inventoryValueElement) {
-      inventoryValueElement.textContent = `${inventoryValue.toFixed(2)}`;
+      inventoryValueElement.textContent = `$${inventoryValue.toFixed(2)}`;
     }
-
+  
     // Cálculo del capital invertido
     const capitalInvertido = products.reduce((total, product) => {
       return total + (parseFloat(product.price) * parseInt(product.quantity));
     }, 0);
-
-    // Cálculo de productos vendidos
-    const productosVendidos = products.reduce((sum, product) => {
-      return sum + (parseInt(product.quantity) - parseInt(product.stock));
+  }
+  
+  actualizarProductosVendidos() {
+    const productosVendidosElement = document.getElementById('widget-productos-vendidos');
+    
+    // Obtén el historial de ventas
+    const salesHistory = LocalStorageManager.getData('salesHistory') || [];
+    
+    // Calcula el total de productos vendidos basado en el historial
+    const totalProductosVendidos = salesHistory.reduce((sum, sale) => {
+      return sum + sale.quantity;
     }, 0);
+    
     if (productosVendidosElement) {
-      productosVendidosElement.textContent = productosVendidos;
-    }
-
-    // Cálculo de ganancias totales
-    const gananciaTotal = products.reduce((sum, product) => {
-      return sum + ((parseInt(product.quantity) - parseInt(product.stock)) * parseFloat(product.pvp));
-    }, 0);
-    if (gananciaTotalElement) {
-      gananciaTotalElement.textContent = `${gananciaTotal.toFixed(2)}`;
+      productosVendidosElement.textContent = totalProductosVendidos;
     }
   }
+  
+  actualizarGananciaTotal() {
+    const gananciaTotalElement = document.getElementById('widget-ganancia-total');
+  
+    // Obtén el historial de ventas (si existe)
+    const salesHistory = LocalStorageManager.getData('salesHistory') || [];
+    
+    // Calcula la ganancia basada en el historial de ventas
+    const gananciaHistorial = salesHistory.reduce((sum, sale) => {
+      return sum + (sale.quantity * parseFloat(sale.price));
+    }, 0);
+    
+    if (gananciaTotalElement) {
+      gananciaTotalElement.textContent = `$${gananciaHistorial.toFixed(2)}`;
+    }
+  }
+
+
+
+
+
+// En AdminPanel.js
+ 
+
+// Escucha el evento de venta confirmada para actualizar la ganancia total
 
 
   /**
@@ -411,59 +394,6 @@ class AdminPanel {
    * Maneja el envío del formulario de Producto.
    * @param {boolean} isEdit Indica si es edición (true) o creación (false)
    */
-//  handleProductFormSubmit(isEdit) {
-//    const productId = document.getElementById('product-id').value;
-//    const name = document.getElementById('product-name').value;
-//    const price = document.getElementById('product-price').value;
-//    const quantity = document.getElementById('product-quantity').value;
-//    const pvp = document.getElementById('product-pvp').value;
-//    const stock = document.getElementById('product-stock').value;
-//    const categoryId = document.getElementById('product-category').value || null;
-//    const supplierId = document.getElementById('product-supplier').value || null;
-//    const description = document.getElementById('product-description').value;
-//    const imgLink = document.getElementById('product-imgLink').value;
-//
-//    let success = false;
-//    if (productId) {
-//      success = ProductService.updateProduct(productId, {
-//        name,
-//        price: parseFloat(price),
-//        quantity: parseInt(quantity),
-//        pvp: parseFloat(pvp),
-//        stock: parseInt(stock),
-//        categoryId,
-//        supplierId,
-//        description,
-//        imgLink
-//      });
-//      if (success) {
-//        NotificationManager.success('Producto actualizado correctamente');
-//      }
-//    } else {
-//      success = ProductService.createProduct(
-//        name,
-//        price,
-//        quantity,
-//        pvp,
-//        stock,
-//        categoryId,
-//        supplierId,
-//        description,
-//        imgLink
-//      );
-//      if (success) {
-//        NotificationManager.success('Producto creado correctamente');
-//      }
-//    }
-//    if (success) {
-//      this.modalManager.closeFormModal();
-//      this.loadWidgets();
-//      this.initCharts();
-//      if (isEdit && this.lastTableModalCallback) {
-//        this.lastTableModalCallback();
-//      }
-//    }
-//  }
   handleProductFormSubmit(isEdit) {
     const productId = document.getElementById('product-id').value;
     const name = document.getElementById('product-name').value;
@@ -592,38 +522,7 @@ class AdminPanel {
   /**
    * Maneja la edición de un Producto.
    */
- // handleEditProduct(id) {
- //   this.lastTableModalCallback = () => {
- //     const productsNew = ProductService.getAllProducts();
- //     const categoriesNew = CategoryService.getAllCategories();
- //     const suppliersNew = SupplierService.getAllSuppliers();
- //     const newTableHTML = this.tableManager.generateProductTable(
- //       productsNew,
- //       categoriesNew,
- //       suppliersNew
- //     );
- //     if (productsNew.length > 0) {
- //       this.modalManager.showTableModal("Listado de Productos", newTableHTML);
- //       this.configureTableButtons();
- //     } else {
- //       this.modalManager.closeTableModal();
- //     }
- //   };
- //   this.modalManager.closeTableModal();
- //   const product = ProductService.getProductById(id);
- //   if (product) {
- //     const formHTML = this.modalManager.createProductForm(product); // aqui condicion para que se abra el mismo formulario de crear, cuando se de click en el btn de actualizar
- //     this.modalManager.showFormModal("Editar Producto", formHTML);
- //     this.attachCancelListener();
- //     const productForm = document.getElementById("product-form");
- //     if (productForm) {
- //       productForm.addEventListener("submit", (e) => {
- //         e.preventDefault();
- //         this.handleProductFormSubmit(true);
- //       }, {once: true});
- //     }
- //   }
- // }
+ 
  handleEditProduct(id) {
   this.lastTableModalCallback = () => {
     const productsNew = ProductService.getAllProducts();

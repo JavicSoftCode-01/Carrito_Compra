@@ -465,22 +465,77 @@ class CartsPage {
       document.body.appendChild(modal);
 
       // Si el usuario decide seguir con la compra:
-      document.getElementById('confirm-seguir').addEventListener('click', () => {
-        document.body.removeChild(modal);
-        // Inicia temporizador de 1 minuto para actualizar stock y limpiar el carrito
-        purchaseTimer = setTimeout(() => {
-          // Actualizar el stock en localStorage o en la lógica de negocio según corresponda
-          cartItemIds.forEach(productId => {
-            // Ejemplo: localStorage.removeItem(`stock_${productId}_${this.cartItems[productId]}`);
+      //document.getElementById('confirm-seguir').addEventListener('click', () => {
+      //  document.body.removeChild(modal);
+      //  // Inicia temporizador de 1 minuto para actualizar stock y limpiar el carrito
+      //  purchaseTimer = setTimeout(() => {
+      //    // Actualizar el stock en localStorage o en la lógica de negocio según corresponda
+      //    cartItemIds.forEach(productId => {
+      //      // Ejemplo: localStorage.removeItem(`stock_${productId}_${this.cartItems[productId]}`);
+      //    });
+      //    // Limpiar el carrito y actualizar tanto la factura como las tarjetas de items
+      //    this.cartItems = {};
+      //    LocalStorageManager.removeData(this.CART_STORAGE_KEY)
+      //    this.renderCartSummary();
+      //    this.renderCartItems();
+      //    NotificationManager.success("Compra finalizada.");
+      //  }, 5000); // 60000 milisegundos = 1 minuto
+      //});
+
+
+
+     // En cartsServices.js, dentro del listener de 'confirm-seguir'
+     document.getElementById('confirm-seguir').addEventListener('click', () => {
+      document.body.removeChild(modal);
+    
+      // Inicializa el historial de ventas si no existe
+      let salesHistory = LocalStorageManager.getData('salesHistory') || [];
+    
+      // Recorre los productos del carrito y registra la venta con el precio actual
+      cartItemIds.forEach(productId => {
+        const product = this.products.find(p => p.id === productId);
+        if (product) {
+          // Obtiene la cantidad en el carrito para este producto
+          const cartQuantity = this.cartItems[productId] || 0;
+          
+          // Registra esta venta en el historial con el precio actual
+          salesHistory.push({
+            productId: product.id,
+            productName: product.name,
+            price: parseFloat(product.pvp),
+            quantity: cartQuantity,
+            date: new Date().toISOString()
           });
-          // Limpiar el carrito y actualizar tanto la factura como las tarjetas de items
-          this.cartItems = {};
-          LocalStorageManager.removeData(this.CART_STORAGE_KEY)
-          this.renderCartSummary();
-          this.renderCartItems();
-          NotificationManager.success("Compra finalizada.");
-        }, 5000); // 60000 milisegundos = 1 minuto
+          
+          // Actualiza el stock del producto
+          product.stock = parseInt(product.stock) - cartQuantity;
+        }
       });
+    
+      // Guarda el historial de ventas actualizado
+      LocalStorageManager.setData('salesHistory', salesHistory);
+      
+      // Guarda el estado actualizado de los productos en el localStorage
+      LocalStorageManager.setData('products', this.products);
+    
+      // Despacha un evento personalizado para notificar que se confirmó la venta
+      document.dispatchEvent(new CustomEvent('saleConfirmed'));
+    
+      // Continúa con el temporizador y el flujo de compra
+      purchaseTimer = setTimeout(() => {
+        this.cartItems = {};
+        LocalStorageManager.removeData(this.CART_STORAGE_KEY);
+        this.renderCartSummary();
+        this.renderCartItems();
+        NotificationManager.success("Compra finalizada.");
+      }, 5000);
+    });
+
+      
+
+
+
+
 
       // Si el usuario decide cancelar la compra:
       document.getElementById('confirm-cancelar').addEventListener('click', () => {
